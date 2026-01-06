@@ -7,7 +7,7 @@ I am a bit of a nerd which is why I want to learn more about data science, becau
 
 Gmail: jinmoon@ucdavis.edu 
 
-##Top favorite things I like to do 
+## Top favorite things I like to do 
 + going on an outting to explore places near me
 + crafting (woodwork, gundams, models)
 + volunteering (I've helped out at student farm, school events, the Pantry, and interning at a middle school)
