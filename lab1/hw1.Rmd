@@ -1,6 +1,6 @@
 ---
 title: "Lab 1 Homework"
-author: "Your Name Here"
+author: "Jina Moon"
 date: "`r Sys.Date()`"
 output:
   html_document: 
@@ -12,11 +12,18 @@ Answer the following questions and/or complete the exercises in RMarkdown. Pleas
 
 **1. Please tell us why you are taking BIS 15L.**
 
+I'm taking it because it's a prereq for a class I want to take that utilizes data science with a genetics focus (BIS180L). Additionally, I wanted to get more experience utilizing R, and have project based fun. I'm still exploring career options utilizing coding, so I just want to see if coding is more fun if it's project based (I switched out of CS major because I realized that coding isn't hard, but was also not exciting without real application). 
+
 **2. Do you have any coding experience? If yes, please tell us what languages you have coded in and your level of experience.**
+
+Yes, I was a CS major last year, so I took all of the ECS36 series, and other intro to coding classes. I learned and utilized mainly C and C++. Also learned a little bit of R in STA100, but it was mostly copying and pasting, and we used POSIT cloud instead, of the desktop application. 
 
 **3. Navigate to the `datascibiol` repository on GitHub. Notice that near the bottom there is a description of the repository. You want something like this on your repository! It is built by making edits to the `README.md` file using RMarkdown. Edit your repository's `README.md` file so that you have an informative description, including your email address. Be creative! You don't need to just copy mine. There are lots of examples online.**  
 
+
 **4. Please put a link to your GitHub repository below.**
+
+
 
 **5. Make sure that your repository includes the practice file `dummy_push` from lab 1.2. If you have not done so already, please add your name to this file, knit it, and push it to your repository.**  
 
