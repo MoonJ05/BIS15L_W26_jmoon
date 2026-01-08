@@ -1,3 +1,4 @@
+
 ---
 title: "Lab 2 Intro"
 date: "`r Sys.Date()`"
@@ -27,10 +28,15 @@ library("jpeg")
 ## Review from last time
 ### *With a partner, discuss the following questions*
 1. What is the difference between R and RStudio?  
-2. What is GitHub and GitHub Desktop and why are they useful to programmers?  
+R is the program that actually works with the code, whereas RStudio is a user-friendly interface to work with R. 
+2. What is GitHub and GitHub Desktop and why are they useful to programmers?
+GitHub is the website, and GitHub Desktop is an application that lets you interact with the website. They are useful to programmers as they let you work collaboratively with people.
 3. What is version control and why is it useful to programmers?  
+It helps keep track of changes, and makes it easier to backtrack and fix things. 
 4. What is a repository?  
+It's a place you can put your work. 
 5. What is the difference between committing and pushing?  
+Committing saves it to your local repository. Pushing it uploads your saves to the internet, and shared space. 
 
 ## AI
 1. In BIS 15L, we will use AI as a tool to make us more efficient programmers.  
