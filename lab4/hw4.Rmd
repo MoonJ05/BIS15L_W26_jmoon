@@ -106,11 +106,11 @@ Yes there seems to be a positive relationship between Brain weight and Body weig
 
 **10. Build one plot of your choice that provides additional insight into the msleep dataset. Be sure to include appropriate labels and a title.**
 
-Looking at correlationship between rem sleep and sleep total 
+Looking at relationship between rem sleep and sleep total 
 ```{r}
 #scatter plot 
 ggplot(data=msleep, mapping=aes(x=sleep_total, y=sleep_rem))+
-  geom_point(mapping=aes(color=vore, shape=vore))+
+  geom_point(mapping=aes(color=vore, shape=vore))+ #added vore types for more insights
   geom_smooth(method=lm, se=T)+ #added line of best fit, with standard error
   labs(title="Sleep Total (hrs) vs. Rem Sleep (hrs)", x="Sleep Total (hrs)", y="Rem Sleep (hrs)")
 ```
