@@ -42,7 +42,9 @@ ggplot(data=msleep, #specified data
        mapping=aes(x=vore))+ #mapped aesthetics 
   geom_bar(mapping = aes(fill=vore))+ #added color to bar
   labs(title="Number of mammals in each vore type", x="vore type", y="count")
+
 ```
+
 Herbivores are the most represented in our data. 
 
 **4. What is the average length of time that each mammal sleeps?**
@@ -78,7 +80,9 @@ ggplot(data=msleep, mapping=aes(x=bodywt, y=sleep_total))+
   scale_x_log10()+ #scaled the x-axis this time.. 
   labs(title="Body Weight (kg) vs. Total Sleep Time (hrs)", x="Body Weight (kg)", y="Total Sleep Time (hrs)")
 ```
+
 Yes, there seems to be negative relationship between body weight and total sleep time... as body weight increases, the less sleep time overall 
+
 **8. Which vore type tends to sleep the most? Build a plot to support your answer.**
 ```{r}
 names(msleep)
@@ -90,6 +94,7 @@ ggplot(data=msleep, mapping = aes(x=vore, y=sleep_total))+
   geom_boxplot(mapping=aes(color=vore))+ 
   labs(title="Total sleep times by vore type", x= "vore type", y="total sleep time (hrs)")
 ```
+
 Comparing the median, the insectivore vore type seems like they sleep the most. 
 
 **9. Is there a relationship between brain weight and body weight? Build a plot to support your answer.**
@@ -102,7 +107,8 @@ ggplot(data=msleep, mapping=aes(x=brainwt, y=bodywt))+
   geom_smooth(method=lm, se=T)+ #added line of best fit, with standard error
   labs(title="Brain Weight (kg) vs. Body Weight (kg)", x="Brain Weight (kg)", y="Body Weight (kg)")
 ```
-Yes there seems to be a positive relationship between Brain weight and Body weight. 
+
+Yes, there seems to be a positive relationship between Brain weight and Body weight. 
 
 **10. Build one plot of your choice that provides additional insight into the msleep dataset. Be sure to include appropriate labels and a title.**
 
