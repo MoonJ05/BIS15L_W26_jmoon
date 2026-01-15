@@ -1,6 +1,6 @@
-"mountain_name","height_feet","height_meters","first_climbed","summits","fatalities","fatality_rate"
-"Mount Everest",29029,8848,1953,12884,340,0.0263893200869295
-"K2",28251,8611,1954,800,96,0.12
-"Kangchenjunga",28169,8586,1955,532,52,0.0977443609022556
-"Lhotse",27940,8516,1956,933,20,0.0214362272240086
-"Makalu",27838,8485,1955,499,72,0.144288577154309
+"mountain_name","mountain_height_in_feet","mountain_height_in_meters","first_climbed","summits","fatalities","fatality_rate"
+"Mount Everest",29032,8849,1953,11000,310,0.0281818181818182
+"K2",28251,8611,1954,400,90,0.225
+"Kangchenjunga",28169,8586,1955,300,50,0.166666666666667
+"Lhotse",27940,8516,1956,900,30,0.0333333333333333
+"Makalu",27838,8485,1955,600,27,0.045
