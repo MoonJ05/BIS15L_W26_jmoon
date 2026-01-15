@@ -186,21 +186,24 @@ How many individuals per species?
 #bar plot is a count of categorical 
 ggplot(data=penguins, 
        mapping=aes(x=species))+ #since count, no need to tell what y is! 
-  geom_bar()
+  geom_bar()+
+  labs(title="# of individuals per species")
 ```
 
 What if we want to use the color aesthetic like we did for `geom_point` above? Let's try...
 ```{r}
 ggplot(data=penguins, 
        mapping=aes(x=species))+ 
-  geom_bar(mapping=aes(color=species)) #works but not ideal 
+  geom_bar(mapping=aes(color=species))+ #works but not ideal
+  labs(title = "#Penguins for each species")
 ```
 
 This doesn't work because the color aesthetic is being applied to the bars themselves. Instead, we need to use `fill` to color the inside of the bars.
 ```{r}
 ggplot(data=penguins, 
        mapping=aes(x=species))+ 
-  geom_bar(mapping=aes(fill=species)) #command to color the whole bar
+  geom_bar(mapping=aes(fill=species))+ #command to color the whole bar
+  labs(title = "#Penguins for each species")
 ```
 
 ## Practice
@@ -212,16 +215,23 @@ names(penguins)
 ```{r}
 ggplot(data=penguins, 
        mapping=aes(x=island))+ 
-  geom_bar(mapping=aes(fill=island))
+  geom_bar(mapping=aes(fill=island))+
+  labs(title = "#Penguins on each island")
 ```
 
 2. Make a bar plot showing the number of penguins of each species on each island. (Hint: use `fill` to distinguish species)
 ```{r}
 ggplot(data=penguins, 
        mapping=aes(x=island))+ 
-  geom_bar(mapping=aes(fill=species))
+  geom_bar(mapping=aes(fill=species))+
+  labs(title = "#Penguins for each species by island")
 ```
-
+```{r}
+ggplot(data=penguins, 
+       mapping=aes(x=island))+ 
+  geom_bar(mapping=aes(fill=species), position="dodge")+ #add position to make it side by side 
+  labs(title = "#Penguins for each species by island")
+```
 ## Wrap-up  
 Please review the learning goals and be sure to use the code here as a reference when completing the homework.    
 
