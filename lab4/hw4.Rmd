@@ -90,7 +90,7 @@ ggplot(data=msleep, mapping = aes(x=vore, y=sleep_total))+
   geom_boxplot(mapping=aes(color=vore))+ 
   labs(title="Total sleep times by vore type", x= "vore type", y="total sleep time (hrs)")
 ```
-Comparing the medain, the insectivore vore type seems like they sleep the most. 
+Comparing the median, the insectivore vore type seems like they sleep the most. 
 
 **9. Is there a relationship between brain weight and body weight? Build a plot to support your answer.**
 ```{r}
@@ -105,8 +105,14 @@ ggplot(data=msleep, mapping=aes(x=brainwt, y=bodywt))+
 Yes there seems to be a positive relationship between Brain weight and Body weight. 
 
 **10. Build one plot of your choice that provides additional insight into the msleep dataset. Be sure to include appropriate labels and a title.**
-```{r}
 
+Looking at correlationship between rem sleep and sleep total 
+```{r}
+#scatter plot 
+ggplot(data=msleep, mapping=aes(x=sleep_total, y=sleep_rem))+
+  geom_point(mapping=aes(color=vore, shape=vore))+
+  geom_smooth(method=lm, se=T)+ #added line of best fit, with standard error
+  labs(title="Sleep Total (hrs) vs. Rem Sleep (hrs)", x="Sleep Total (hrs)", y="Rem Sleep (hrs)")
 ```
 
 ## Knit and Upload
