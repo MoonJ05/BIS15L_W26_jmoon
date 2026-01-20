@@ -23,41 +23,75 @@ Data: http://datadryad.org/resource/doi:10.5061/dryad.q5j65/1
 
 **1. Load the data into a new object called `homerange`.**
 ```{r}
-
+getwd()
+homerange <- read.csv("data/Tamburelloetal_HomeRangeDatabase.csv")
 ```
 
 **2. What is the structure of the `homerange` data? Does it have any NA's? Do a quick exploratory analysis of your choice below.**
 ```{r}
-
+glimpse(homerange) #I chose to use glimpse, as it gives an overview of column names, types, as well as what kind of values each column has. From this we can see that the data does have quite a lot of NA's 
 ```
 
 ```{r}
-
+summary(homerange)
+#this one gives a more overview of specifics, and more detained analysis. Downside, is that it doesn't give you an idea of the raw data in the columns (NA's etc. )
 ```
 
 **3. Which animal groups are represented in the data? Make a plot that shows the number in each class.**
 ```{r}
-
+names(homerange)
 ```
+```{r}
+#count by class.. so bar 
+ggplot(data=homerange, mapping=aes(x=class))+ 
+  geom_bar(mapping=aes(fill=class))+ 
+  labs(title="# of individuals per class")
+```
+
+The animal groups represented are actinopterygii, aves, mammalia, and reptilia 
 
 **4. Are there more carnivores or herbivores represented in the data? Make a plot that shows the number in each trophic guild.**
 ```{r}
-
+ggplot(data=homerange, mapping=aes(x=trophic.guild))+ 
+  geom_bar(mapping=aes(fill=trophic.guild))+ 
+  labs(title="# of individuals per trophic guild", x="trophic guild")
 ```
+
+There are more carnivores than herbivores. 
 
 **5. Which herbivorous mammals have homeranges greater than 1,000,000 m²? Show only the common name, order, mean homerange size, and mean body mass. Arrange the data in descending order by homerange size and show only the top 10 species.**
 ```{r}
+names(homerange)
+```
 
+```{r}
+#using pipe to do this. 
+homerange %>% 
+  select(common.name, order, mean.hra.m2, mean.mass.g) %>% 
+  filter(mean.hra.m2 > 1000000) %>% 
+  arrange(desc(mean.hra.m2)) %>% 
+  slice_max(mean.hra.m2, n = 10)
 ```
 
 **6. Which two species have the largest and smallest homerange sizes?**
 ```{r}
-
+#Species with largest homeranage size 
+homerange %>% 
+  select(species, mean.hra.m2) %>% 
+  slice_max(mean.hra.m2, n=1)
 ```
+
+The species with the largest homerange size is Tarandus (legendary reindeer-- well species). 
+
 
 ```{r}
-
+#species with smallest homerange size 
+homerange %>% 
+  select(species, mean.hra.m2) %>% 
+  slice_min(mean.hra.m2, n=1)
 ```
+
+The species with the smallest homerange size is hipoliti... 
 
 **7. Which carnivorous mammals have the largest homeranges?**
 ```{r}
