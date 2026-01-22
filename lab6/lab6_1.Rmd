@@ -136,8 +136,7 @@ What is the structure of the data? Are there any NA's or other issues?
 
 One thing to notice is the column names are inconsistent. This is going to cause problems for us down the line. We could rename each column, one at a time, using `rename()`, but that would be tedious. Instead, we can use the `clean_names()` function from the `janitor` package to fix all of the column names at once.
 ```{r}
-mammals <- mammals
-mammals %>% 
+mammals <- mammals %>% 
   clean_names()
 glimpse (mammals)
 ```
