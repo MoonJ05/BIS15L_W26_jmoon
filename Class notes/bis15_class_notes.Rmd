@@ -1,0 +1,214 @@
+---
+title: "BIS15L Notes"
+author: "Jina Moon"
+date: "`r Sys.Date()`"
+output:
+  html_document: 
+    theme: spacelab
+---
+
+## Load the tidyverse
+```{r message=FALSE, warning=FALSE}
+library("tidyverse")
+library("janitor")
+```
+
+**Computer Hygeine**
+
+Sometimes I suppose it is good to keep my desktop, tabs, and physical laptop clean– 
+
+**GitHub**
+
+https://github.com/MoonJ05/BIS15L_W26_jmoon.git ← link to my repository 
+
+**Keyboard short cuts (mac)**
+
+* Option + “-” gets symbol (<-) 
+* Command + option + i creates a code chunk 
+* Command + return runs 
+  
+**Basic commands**
+
+```{r}
+getwd()    #checks current directory 
+setwd("") 	#changes your working directory to "" 
+write.csv(data_name, "datafile.csv", row.names=FALSE)	#row.names avoid row numbers from printing out. Saves data frame data_name as .csv file 
+Data_name <- read.csv("datafile.csv")	 #import .csv file 
+y <- 3 		#assigns new value to object
+?round 		#learn how to use function (ex. round) 
+X <- c(1, 2, 3)		#vector… ! can store multiple values (concatenate) 
+# ex. char_vector <- c("Monday", "Tuesday")
+#     Sequence <- c(1:100) 
+
+X[2] 		#outputs a 2… vector starts at index 1
+X <=10		#outputs T/F for all values in vector X <= to 10 
+x[x<=10]	#using ‘[ ]’ outputs values not bool of entire vector
+# <, >, ==, <=, >= 
+Data <- data		#reads data into R to visualize 
+```
+
+**Tidyverse**
+
+Collection of R packages designed for data science. 
+* Load with library(“tidyverse”)
+```{r}
+#Creating data frame with tibble: 
+#First create vectors you want in the data frame in same orders
+Name_data <- tibble(vector1, vector2, vector3) 
+# ex. birds <- tibble (sex, length, weight) 
+```
+
+
+**Dplyr**
+
+Used to transform data frames by extracting, rearranging, and summarizing data. 
+
+```{r}
+#use 'df(dataframe) <- ' to save changes concretely 
+select(data_name, var_1, var_2)	  #pull out columns of interest from the dataframe.. Order matters 
+select(data_name, start_col_name:end_col_name) 		#pulls all the between too 
+select(data_name, !var_1)		#pulls all except specified
+select(data_name, !c(var_1, var_2))	#applies to all in vector
+select(data_name, contains ("mm")) 	#pulls if has mm
+    starts_with("a")
+    ends_with("z")
+    where(is.numeric()) 		#based on class of data
+rename(data_name, new_name = old_name) 
+select(data_name, var1, var2New = var2) #does the same thing as rename above.
+
+relocate(data_frame, var4) 		#relocates variable to first column
+filter(data_name, var== "specific_cat")	#extracts data that meet criteria within row 
+var_1 >= 400
+# >, >=, <, <=, !=, ==
+Var_1 %in% c(5250, 5500) 		#restricts to these two values (exactly)
+between(var, value_min, value_max) 
+near(var, 5400, tol=100)		#splits into 50 left, 50 right! 5350 to 5450 
+#Conditional operators if multiple conditions
+#   & 	checks for both …. Separating with “,” defaults to &
+#   |	 “or” 
+```
+
+**Pipies**
+
+Feed the output from one function into the input of another function 
+
+```{r}
+#ex.  
+Data %>%
+  select(data, var_1) %>%
+  filter(var_1 == "specific") %>%
+  arrange(var_1) 
+#general rule select goes first. Arrange defaults to ascending ,but can do desc()
+
+slice_max(var_1, n = 1) 	#outputs n max
+slice_head(var_1, n = 1) 
+slice_min()
+slice_tail() 
+```
+
+**Data Frames**
+
+```{r}
+names(data) 		#gives you names of vector (column) 
+dim(data)		#gives dimensions
+str(data)
+summary(data) 	#summarizes data frame
+glimpse(data)		#gives basic
+nrow(data)		#gives number of rows
+ncol(data)		#gives number column 
+head(data, n)		#prints first n  rows of data frame
+tail(data, n)		#prints the last n rows of data frame
+Data[row, column]		#can do data[1,] for first row, data[,3] for third column
+mean(hbirds$length)		#use $ to access column (var) in data frame 
+
+#To add new data to the data frame… 
+Data <- tibble(var1, var2,var3,...)	#recreate whole data
+#Can also do …. 
+data$nameNewVar <- NewVar
+Add_column(data, newVarVector)
+#if you do / + * - to a vector using a different vector, it automatically creates a new vector with values 
+
+distinct() 	#outputs all the unique observations in rows. If there is no duplicate of any mix of data, all should print. 
+Dataframe %>% distinct(var1)	#looks at var1 and unique observations of that variable, in the data frame.
+distinct(var1, var2, .keep_all = T) #looks at both… last part makes sure other part of row printed too
+mutate(new_varName = old / 1000) #create new columns from existing ones in the data frame. Added to end by default. 
+mutate(across(ends_with("mm"), ~./10)) #applies to all columns ending with ‘mm’
+~./10 #lambda function (formula)... ‘.’ current column… 
+```
+
+**Data Rules / Cleaning Data**
+
+```{r}
+#Use lowercase (everything)
+rename() #to change column names or using select() 
+Data_name <- data_name %>% clean_names()  #Cleans name and fixes everything! All lower case and spaces to underscores. 
+#For observations itself: 
+Dataframe %>% mutate(across(c("var1", "var2"), tolower)) #to lower case… but numeric becomes char if included… 
+Datafame %>% mutate(across(where(is.character), tolower)) #safer
+
+#Using ifelse… 
+
+#ifelse(logical statement, true, false) … 
+#ex. 
+ifesle(newborn == -999.00, NA, newborn)
+mutate(newborn_new=ifelse(newborn == 999, NA, newborn))
+#For ALL
+mutate(across(c(a,b,c) ~ifelse(.== -999.00, NA, .))) 
+#‘.’ is current. ~ to start formula 
+```
+
+**Types of Data**
+
+```{r}
+Numeric (42) #Dbl means double precision floating point 
+Integer (2L) #L denotes integer (whole number) 
+Character ("universe")
+Logical (T/F) 
+
+#Factors: categorical variables that have a fixed number of possible values called levels
+#Discrete: quantitative data w/ only integers
+#Continuous: quantitative data with any numerical value 
+#Categorical: qualitative data with limited number of values
+
+class(object)		#gives you what type of data you are working with 
+is.integer(object)	#checks T/F if specific type
+as.integer(object)	#converts to integer
+hotsprings$scientist <- as.factor (hotsprings$scientist)	#converts to factor 
+levels(data$variable)	#checks for level
+table(data$variable)	#gives level and count
+# NA is filled in for missing … is.na(object) checks boolean 
+anyNA(object)		#checks of any NA in vector 
+mean(vector, na.rm = T) 
+```
+
+**Graphs**
+
+```{r}
+#Basic idea: plot = data + geom_ + aesthetics. 
+#Use scale_x_log10() to scale x-axis
+#Use scale_y_log10() to scale y-axis 
+
+#Box plot (categorical vs. continuous) !!
+		ggplot (data=data_name, 
+		Mapping=aes(x=x_var_name, y=y_var_name)) + 
+		geom_boxplot(mapping=aes(color = categorical_var_name)) +
+		Labs (title = "x (unit) vs. y", x= "x_var", y = "y_var") 
+# *remember. Box plot = median and IQR… NOT mean. 
+
+#Scatter plots (continuous vs. continuous) 
+	ggplot (data=data_name, 
+	mapping=aes(x=x_var_name, y=y_var_name)) + 
+	geom_point(na.rm=T, mapping=aes(color=var_name, shape=var_name)) + 
+	geom_smooth(method=lm, se=T) +
+	labs(title= "title", x= "x variable title", y = "y variable title") 
+#… color can make data points a different color like species differentiate (adding within the initial one makes multiple regression lines, doing it with geom_point makes color only applied to points. na.rm=T removes NA warning, geom_smooth adds regression line, and se=T adds standard error
+
+#Barplots (counts # observation for one categorical) 
+	ggplot(data=data_name, 
+	mapping=aes(x=x_var))+ 
+	geom_bar(mapping=aes(fill=x_var))+
+	labs(title= "title", x= "x_var", y = "count") 
+#use fill instead of color to fill inside bars. Fill can be a different categorical variable. 
+#mapping= aes() 		#anytime you want to add color or shape 
+
+```
