@@ -34,67 +34,117 @@ glimpse(gabon)
 **3. Clean the data as necessary following the conventions from lab 6.**
 ```{r}
 gabon <- gabon %>% 
-  mutate(across(where(is.character), tolower)) #specific columns 
-glimpse(gabon)
+  clean_names()%>% #cleans col names
+  mutate(across(where(is.character), tolower)) #cleans observations to lower case 
 ```
 
 ```{r}
-
+glimpse(gabon) #make sure changes made
 ```
 
 **4. Use `mutate()` Change the variables `HuntCat`, `LandUse`, and `TransectID` to factors. Be sure to store the output as a new dataframe and use it for the remaining questions.**
 ```{r}
-
+names(gabon)
+gabon <- gabon %>%
+  mutate(across(c(hunt_cat, land_use, transect_id), as.factor))
+glimpse(gabon)
 ```
 
 **5. Make a plot that shows the number of transects for each land use type.**
 ```{r}
-
+#count so bar plot
+ggplot(data=gabon, 
+       mapping=aes(x=land_use)) + 
+  geom_bar(mapping=aes(fill=land_use)) + #bar plot
+  labs(title = "Number of Transects for Each Land Use Type", x = "Land Use Type", y = "Count", fill= "Land Use Type")
 ```
 
-```{r}
-
-```
 
 **6. How does vegetation richness compare among land use types?**
 ```{r}
-
+#continuous and categorical so box plot
+ggplot(data = gabon, 
+       mapping = aes(x=land_use , y = veg_rich)) +
+  geom_boxplot(mapping = aes(fill = land_use)) + 
+  labs(title = "Land Use Type vs. Vegetation Richness (no. tree species)", x = "Land Use Type", y = "Vegetation Richness (no. tree species)", fill = "Land Use Type")
 ```
+
+Park tends to have more vegetation richness compared to logging or others, whereas logging has slightly more chance of having greater vegetation richness than others. 
+
 
 **7. For which land use type (national parks, logging, or neither) is average all species diversity the greatest?**
 ```{r}
-
+names(gabon) #idea of columns 
 ```
 
 ```{r}
-
+gabon %>% 
+  select(land_use, diversity_all_species) #view columns being worked with 
 ```
 
 ```{r}
-
+#technically, not "average" since median, so I'll do further calculation, but also general trend should be depicted via box plot 
+ggplot(data = gabon, 
+       mapping = aes(x=land_use , y = diversity_all_species)) +
+  geom_boxplot(mapping = aes(fill = land_use)) + 
+  labs(title = "Land Use Type vs. All Species Diversity", x = "Land Use Type", y = "All Species Diversity", fill = "Land Use Type")
 ```
 
 ```{r}
+#actual math part of this 
+park <- gabon %>%
+  select(land_use, diversity_all_species) %>%
+  filter(land_use=="park")
+avg_park <- mean(park$diversity_all_species)
+avg_park
 
+logging <- gabon %>%
+  select(land_use, diversity_all_species) %>%
+  filter(land_use=="logging")
+avg_logging <- mean(logging$diversity_all_species)
+avg_logging
+
+neither <- gabon %>%
+  select(land_use, diversity_all_species) %>%
+  filter(land_use=="neither")
+avg_neither <- mean(neither$diversity_all_species)
+avg_neither
 ```
+
+The national park has the greatest average all species diversity at 2.425, and as reflected in the box plot in comparison to other land use. 
 
 **8. Is there a relationship between vegetation richness and mammal species richness?**
 ```{r}
+#scatter plot 
+names(gabon) #for reference
 
+ggplot(data = gabon, 
+	mapping = aes(x=veg_rich, y=rich_mammal_species)) + 
+	geom_point(na.rm=T) + 
+	geom_smooth(method=lm, se=F) + 
+  labs(title= "Vegetation Richness (no. tree species) vs. Mammal Species Richness (no. species)", x= "Vegetation Richness (no. tree species)", y = "Mammal Species Richness (no. species)") 
+	
 ```
+
+Yes, there seems to be a positive relationship between vegetation richness and mammal species richness.
+
 
 **9. Use `filter` to find all transects that have greater than 15 tree species or a breast height diameter between 50 and 60cm.  **
 ```{r}
+names(gabon)
 
+gabon %>% 
+  select(transect_id, veg_rich, veg_dbh) %>% #for easier viewing of needed columns 
+  filter((veg_rich > 15) | between(veg_dbh, 50, 60))
 ```
 
-```{r}
-
-```
 
 **10.Which transects and land use types have more than 10 tree species and 10 mammal species? Use `arrange()` to sort by the number of tree species.**
 ```{r}
-
+gabon %>% 
+  select(transect_id, land_use, veg_rich, rich_mammal_species) %>% 
+  filter(veg_rich > 10, rich_mammal_species > 10) %>% 
+  arrange(veg_rich)
 ```
 
 ## Knit and Upload
