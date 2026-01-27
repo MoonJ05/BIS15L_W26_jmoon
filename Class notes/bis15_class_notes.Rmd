@@ -13,22 +13,22 @@ library("tidyverse")
 library("janitor")
 ```
 
-**Computer Hygeine**
+##Computer Hygeine
 
 Sometimes I suppose it is good to keep my desktop, tabs, and physical laptop clean– 
 
-**GitHub**
+##GitHub
 
 https://github.com/MoonJ05/BIS15L_W26_jmoon.git ← link to my repository 
 
-**Keyboard short cuts (mac)**
+##Keyboard short cuts (mac)
 
 * Option + “-” gets symbol (<-) 
 * Command + option + i creates a code chunk 
 * Command + return runs
 * command + shift + 'm' gets %>% 
   
-**Basic commands**
+##Basic commands
 
 ```{r}
 getwd()    #checks current directory 
@@ -48,7 +48,7 @@ x[x<=10]	#using ‘[ ]’ outputs values not bool of entire vector
 Data <- data		#reads data into R to visualize 
 ```
 
-**Tidyverse**
+##Tidyverse
 
 Collection of R packages designed for data science. 
 * Load with library(“tidyverse”)
@@ -60,7 +60,7 @@ Name_data <- tibble(vector1, vector2, vector3)
 ```
 
 
-**Dplyr**
+##Dplyr
 
 Used to transform data frames by extracting, rearranging, and summarizing data. 
 
@@ -89,7 +89,7 @@ near(var, 5400, tol=100)		#splits into 50 left, 50 right! 5350 to 5450
 #   |	 “or” 
 ```
 
-**Pipies**
+##Pipies
 
 Feed the output from one function into the input of another function 
 
@@ -107,7 +107,7 @@ slice_min()
 slice_tail() 
 ```
 
-**Data Frames**
+##Data Frames
 
 ```{r}
 names(data) 		#gives you names of vector (column) 
@@ -137,7 +137,7 @@ mutate(across(ends_with("mm"), ~./10)) #applies to all columns ending with ‘mm
 ~./10 #lambda function (formula)... ‘.’ current column… 
 ```
 
-**Data Rules / Cleaning Data**
+##Data Rules / Cleaning Data
 
 ```{r}
 #Use lowercase (everything)
@@ -159,7 +159,7 @@ mutate(across(c(a,b,c) ~ifelse(.== -999.00, NA, .)))
 #‘.’ is current. ~ to start formula 
 ```
 
-**Types of Data**
+##Types of Data
 
 ```{r}
 Numeric (42) #Dbl means double precision floating point 
@@ -183,7 +183,7 @@ anyNA(object)		#checks of any NA in vector
 mean(vector, na.rm = T) 
 ```
 
-**Graphs**
+##Graphs
 
 ```{r}
 #Basic idea: plot = data + geom_ + aesthetics. 
@@ -191,10 +191,10 @@ mean(vector, na.rm = T)
 #Use scale_y_log10() to scale y-axis 
 
 #Box plot (categorical vs. continuous) !!
-		ggplot (data=data_name, 
+	ggplot (data=data_name, 
 		Mapping=aes(x=x_var_name, y=y_var_name)) + 
 		geom_boxplot(mapping=aes(color = categorical_var_name)) +
-		Labs (title = "x (unit) vs. y", x= "x_var", y = "y_var") 
+		labs (title = "x (unit) vs. y", x= "x_var", y = "y_var") 
 # *remember. Box plot = median and IQR… NOT mean. 
 
 #Scatter plots (continuous vs. continuous) 
@@ -204,6 +204,7 @@ mean(vector, na.rm = T)
 	geom_smooth(method=lm, se=T) +
 	labs(title= "title", x= "x variable title", y = "y variable title") 
 #… color can make data points a different color like species differentiate (adding within the initial one makes multiple regression lines, doing it with geom_point makes color only applied to points. na.rm=T removes NA warning, geom_smooth adds regression line, and se=T adds standard error
+#x is IV, y is DV 
 
 #Barplots (counts # observation for one categorical) 
 	ggplot(data=data_name, 
@@ -215,7 +216,7 @@ mean(vector, na.rm = T)
 
 ```
 
-**Statistical Summaries**
+##Statistical Summaries
 
 ```{r}
 
