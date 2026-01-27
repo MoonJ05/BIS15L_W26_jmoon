@@ -148,20 +148,36 @@ Yes, shoulder height is a positive predictor for tusk length.
 **11. The authors argue that because poachers preferentially target elephants with large tusks, this has resulted in a decrease in average tusk length. Is this supported by the data? Show your code and calculations below.**  
 
 ```{r}
-glimpse(updated_elephants)
 #need to compare old years to newer years.. categorical... and their tusk length (continuous)... so boxplot 
-#		ggplot (data=updated_elephants, 
-#		Mapping=aes(x=years_of_sample_collection, y=tusk_length_in_cm)) + 
-#		labs(title = "Years of Sample Collection vs. Tusk Length (cm)", x= "Years of Sample Collection", y = "Tusk Length (cm)") 
+ggplot (data=updated_elephants, 
+        mapping=aes(x=years_of_sample_collection, y=tusk_length_in_cm)) + 
+        geom_boxplot(mapping=aes(fill = years_of_sample_collection)) +
+        labs(title = "Years of Sample Collection vs. Tusk Length (cm)", x= "Years of Sample Collection", y = "Tusk Length (cm)") 
+
+#can also do it with specific numbers
+updated_elephants %>% 
+  filter(years_of_sample_collection=="1966-68")  %>% 
+    summarize(mean_1966 = mean(tusk_length_in_cm, na.rm=T))
+
+updated_elephants %>% 
+  filter(years_of_sample_collection=="2005-13")  %>% 
+  summarize(mean_2005 = mean(tusk_length_in_cm, na.rm=T))
+
+
 ```
+As seen in the boxplot, as well as the actual average tusk length calculations, there has indeed been an average decrease in tusk length. 
 
 
 **12. Male elephants reach effective sexual maturity at 25 years while females are sexually mature at 12 years. Make a new dataframe that extracts only the males and females at sexual maturity. Then, make a plot that shows the range of tusk length between the two sample periods for these mature elephants.**   
-\
-\
-\
-\
-\
+
+```{r}
+maturity_elephants <- updated_elephants %>% 
+  filter((sex=="f" & estimated_age_years>=12) | (sex=="m" & estimated_age_years>=25))
+maturity_elephants <- maturity_elephants #import and check 
+
+#making the plot 
+```
+
 
 ## Submit the Homework
 1. Save your work and knit the .rmd file.  

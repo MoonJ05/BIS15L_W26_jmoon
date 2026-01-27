@@ -191,10 +191,10 @@ mean(vector, na.rm = T)
 #Use scale_y_log10() to scale y-axis 
 
 #Box plot (categorical vs. continuous) !!
-	ggplot (data=data_name, 
-		Mapping=aes(x=x_var_name, y=y_var_name)) + 
-		geom_boxplot(mapping=aes(color = categorical_var_name)) +
-		labs (title = "x (unit) vs. y", x= "x_var", y = "y_var") 
+ggplot (data=data_name, 
+	mapping=aes(x=x_var_name, y=y_var_name)) + 
+	geom_boxplot(mapping=aes(fill = categorical_var_name)) +
+	labs (title = "x (unit) vs. y", x= "x_var", y = "y_var") 
 # *remember. Box plot = median and IQR… NOT mean. 
 
 #Scatter plots (continuous vs. continuous) 
