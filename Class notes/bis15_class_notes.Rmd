@@ -25,7 +25,8 @@ https://github.com/MoonJ05/BIS15L_W26_jmoon.git ← link to my repository
 
 * Option + “-” gets symbol (<-) 
 * Command + option + i creates a code chunk 
-* Command + return runs 
+* Command + return runs
+* command + shift + 'm' gets %>% 
   
 **Basic commands**
 
@@ -144,6 +145,7 @@ rename() #to change column names or using select()
 Data_name <- data_name %>% clean_names()  #Cleans name and fixes everything! All lower case and spaces to underscores. 
 #For observations itself: 
 Dataframe %>% mutate(across(c("var1", "var2"), tolower)) #to lower case… but numeric becomes char if included… 
+mutate(across(c(years_of_sample_collection, elephant_id, sex), as.factor)) #when changing type.. very similar 
 Datafame %>% mutate(across(where(is.character), tolower)) #safer
 
 #Using ifelse… 
@@ -212,3 +214,10 @@ mean(vector, na.rm = T)
 #mapping= aes() 		#anytime you want to add color or shape 
 
 ```
+
+**Statistical Summaries**
+
+```{r}
+
+```
+
