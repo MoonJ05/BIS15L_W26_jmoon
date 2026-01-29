@@ -132,6 +132,8 @@ Add_column(data, newVarVector)
 distinct() 	#outputs all the unique observations in rows. If there is no duplicate of any mix of data, all should print. 
 Dataframe %>% distinct(var1)	#looks at var1 and unique observations of that variable, in the data frame.
 distinct(var1, var2, .keep_all = T) #looks at both… last part makes sure other part of row printed too
+
+#add new column 
 mutate(new_varName = old / 1000) #create new columns from existing ones in the data frame. Added to end by default. 
 mutate(across(ends_with("mm"), ~./10)) #applies to all columns ending with ‘mm’
 ~./10 #lambda function (formula)... ‘.’ current column… 
@@ -223,6 +225,7 @@ ggplot(data = data_name,
 msleep %>% 
   filter(bodywt>150) %>% 
   summarize(mean_bodywt_lg=mean(bodywt))
+
 msleep %>% 
   filter(bodywt>150) %>% 
   summarize(mean_bodywt_lg=mean(bodywt), 
@@ -247,6 +250,7 @@ msleep %>%
 msleep %>% 
   filter(bodywt>100) %>% 
   summarize(n_genera=n_distinct(genus))
+
 #total obsevations
 msleep %>% 
   filter(bodywt>100) %>% 
