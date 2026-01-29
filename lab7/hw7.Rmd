@@ -175,7 +175,13 @@ maturity_elephants <- updated_elephants %>%
   filter((sex=="f" & estimated_age_years>=12) | (sex=="m" & estimated_age_years>=25))
 maturity_elephants <- maturity_elephants #import and check 
 
-#making the plot 
+#making the plot
+#show range of tusk length between two sample periods... so box plot with sample periods being categorical 
+ggplot (data= maturity_elephants, 
+        mapping=aes(x=years_of_sample_collection, y=tusk_length_in_cm)) + 
+        geom_boxplot(mapping=aes(fill = years_of_sample_collection)) +
+        labs(title = "Years of Sample Collection vs. Tusk Length (cm) for Mature elephants", x= "Years of Sample Collection", y = "Tusk Length (cm)") 
+
 ```
 
 
