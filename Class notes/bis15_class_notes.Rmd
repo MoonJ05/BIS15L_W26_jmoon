@@ -198,19 +198,19 @@ ggplot (data=data_name,
 # *remember. Box plot = median and IQR… NOT mean. 
 
 #Scatter plots (continuous vs. continuous) 
-	ggplot (data=data_name, 
-	mapping=aes(x=x_var_name, y=y_var_name)) + 
-	geom_point(na.rm=T, mapping=aes(color=var_name, shape=var_name)) + 
-	geom_smooth(method=lm, se=T) +
-	labs(title= "title", x= "x variable title", y = "y variable title") 
+ggplot (data = data_name, 
+        mapping=aes(x=x_var_name, y=y_var_name)) + 
+  geom_point (na.rm = T, mapping = aes (color = var_name, shape=var_name)) + 
+  geom_smooth (method = lm, se = T) + 
+  labs (title = "title", x = "name", y = "name", color = "name")
 #… color can make data points a different color like species differentiate (adding within the initial one makes multiple regression lines, doing it with geom_point makes color only applied to points. na.rm=T removes NA warning, geom_smooth adds regression line, and se=T adds standard error
 #x is IV, y is DV 
 
 #Barplots (counts # observation for one categorical) 
-	ggplot(data=data_name, 
-	mapping=aes(x=x_var))+ 
-	geom_bar(mapping=aes(fill=x_var))+
-	labs(title= "title", x= "x_var", y = "count") 
+ggplot(data = data_name, 
+       mapping = aes (x = x_var)) + 
+  geom_bar (mapping = aes(fill = x_var_name)) + 
+  labs (title = "title", x = "x", y = "count")
 #use fill instead of color to fill inside bars. Fill can be a different categorical variable. 
 #mapping= aes() 		#anytime you want to add color or shape 
 
@@ -219,6 +219,59 @@ ggplot (data=data_name,
 ##Statistical Summaries
 
 ```{r}
+#when you want summaries in one line. 
+msleep %>% 
+  filter(bodywt>150) %>% 
+  summarize(mean_bodywt_lg=mean(bodywt))
+msleep %>% 
+  filter(bodywt>150) %>% 
+  summarize(mean_bodywt_lg=mean(bodywt), 
+            min_bodywt_lg=min(bodywt), 
+            max_bodywt_lg=max(bodywt),
+            sd_bodywt_log=sd(bodywt),
+            total=n())
 
+msleep %>% 
+  select(where(is.numeric)) %>%
+  summarize_all(mean, na.rm = T)
+#what they are trying to move people toward 
+msleep %>% 
+  summarize(across(where(is.numeric),
+                   ~mean(.x, na.rm=T))) #.x means for every cell
+
+msleep %>% 
+  filter(bodywt>100) %>% #check to make sure each line is working before moving on 
+  distinct() #gives list of distinct
+
+#distinct. 
+msleep %>% 
+  filter(bodywt>100) %>% 
+  summarize(n_genera=n_distinct(genus))
+#total obsevations
+msleep %>% 
+  filter(bodywt>100) %>% 
+  summarize(total=n())
+
+msleep %>% 
+  filter(bodywt > 100 ) %>% 
+  distinct(genus)
+#as vector
+msleep %>% 
+  filter(bodywt>100) %>%
+  distinct() %>% #if you also put distinct (genus) it only outputs distinct 
+  pull(genus) #gives vector for pull. 
+#count observations 
+msleep %>% 
+  count(vore)
+
+msleep %>% 
+  count(vore, order)
+msleep %>%  
+  tabyl(vore) #gives perent on top of n 
+
+msleep %>% 
+  count(vore) %>% 
+  ggplot(aes(x=vore, y=n)) + #count(vore) gives n 
+  geom_col() #use this when we have an x and a y... geom_bar() is used when no y. 
 ```
 

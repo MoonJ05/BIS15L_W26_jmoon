@@ -115,7 +115,7 @@ msleep %>%
 ```{r}
 msleep %>% 
   filter(bodywt>100) %>% #check to make sure each line is working before moving on 
-  distinct() #gives count of distinct
+  distinct() #gives list of distinct
 ```
 
 Here we show the number of distinct genera over 100 in body weight.
