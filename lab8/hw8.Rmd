@@ -1,0 +1,124 @@
+---
+title: "Homework 8"
+author: "Your Name Here"
+date: "`r Sys.Date()`"
+output:
+  html_document: 
+    theme: spacelab
+    keep_md: yes
+---
+
+## Instructions
+Answer the following questions and/or complete the exercises in RMarkdown. Please embed all of your code and push the final work to your repository. Your report should be organized, clean, and run free from errors. Remember, you must remove the `#` for any included code chunks to run.  
+
+## Load the libraries
+```{r message=FALSE, warning=FALSE}
+library("tidyverse")
+library("janitor")
+library("naniar")
+options(scipen = 999)
+```
+
+## About the Data
+For this assignment we are going to work with a data set from the [United Nations Food and Agriculture Organization](https://www.fao.org/fishery/en/collection/capture) on world fisheries. These data were downloaded and cleaned using the `fisheries_clean.Rmd` script.  
+
+Load the data `fisheries_clean.csv` as a new object titled `fisheries_clean`.
+```{r message=FALSE, warning=FALSE}
+fisheries_clean <- read_csv("data/fisheries_clean.csv") %>% 
+  clean_names() #already cleaned, yes, but more including as habit 
+```
+
+1. Explore the data. What are the names of the variables, what are the dimensions, are there any NA's, what are the classes of the variables, etc.? You may use the functions that you prefer.
+```{r}
+glimpse(fisheries_clean)
+```
+
+2. Convert the following variables to factors: `period`, `continent`, `geo_region`, `country`, `scientific_name`, `common_name`, `taxonomic_code`, and `status`.
+```{r}
+fisheries_clean %>% 
+  mutate(across(where(is.character), as.factor)) #converts all the listed ones into character. also could do indvidually
+```
+
+SKIP QUESTION 3!! 
+```{r}
+#3. Are there any missing values in the data? If so, which variables contain missing values and how many are missing for each variable?
+```
+
+4. How many countries are represented in the data?
+```{r}
+fisheries_clean %>% 
+  summarize(n_distinct=n_distinct(country))
+```
+
+249 different countries are represented in the data 
+
+
+5. The variables `common_name` and `taxonomic_code` both refer to species. How many unique species are represented in the data based on each of these variables? Are the numbers the same or different?
+```{r}
+fisheries_clean %>% 
+  summarize(n_distinct_common_name = n_distinct(common_name), n_distinct_taxonomic_code = n_distinct(taxonomic_code))
+```
+
+For 'common_name' there are 3390 unique species represented, while for 'taxonomic_code' there are 3722 represented. Numbers are different. 
+
+
+6. In 2023, what were the top five countries that had the highest overall catch?
+```{r}
+fisheries_clean %>% 
+  filter(period=="2023") %>%
+  group_by(country) %>% 
+  summarize(sum_catch = sum(catch, na.rm = T)) %>% 
+  arrange(desc(sum_catch)) %>% 
+  head(sum_catch, n =5)
+```
+
+7. In 2023, what were the top 10 most caught species? To keep things simple, assume `common_name` is sufficient to identify species. What does `NEI` stand for in some of the common names? How might this be concerning from a fisheries management perspective?
+```{r}
+fisheries_clean %>% 
+  filter(period=="2023") %>%
+  group_by(common_name) %>% 
+  summarize(sum_catch = sum(catch, na.rm = T)) %>% 
+  arrange(desc(sum_catch)) %>% 
+  head(sum_catch, n =10)
+```
+
+From my search, I got that nei stands for "not elsewhere included" referring to fishes grouped together as they are not specifically classified in the data. This might be concerning from fisheries management perspective as they don't know how much of a specific fish is being caught, and if any endangered fishes are included in these catches, if there is one fish being overcaught, etc. Just overall hard to manage due to lack of data. 
+
+
+8. For the species that was caught the most above (not NEI), which country had the highest catch in 2023?
+```{r}
+#the species based on my data would be "Alaska pollock(=Walleye poll.)" 
+fisheries_clean %>% 
+  filter(period == "2023") %>% 
+  filter(common_name == "Alaska pollock(=Walleye poll.)") %>% 
+  group_by(country) %>% 
+  summarize(sum_catch = sum(catch, na.rm = T)) %>% 
+  arrange(desc(sum_catch)) %>% 
+  head(n = 1)
+```
+
+In 2023 specifically, the Russian Federatio had the highest catch of the Alaska pollock. 
+
+9. How has fishing of this species changed over the last decade (2013-2023)? Create a  plot showing total catch by year for this species.
+```{r}
+#two continuous data so can do scatter plot 
+fisheries_clean %>% 
+  filter(common_name == "Alaska pollock(=Walleye poll.)") %>% 
+  filter(period >= 2013, period <= 2023) %>% 
+  group_by(period) %>% 
+  summarize(total_catch = sum(catch)) %>%  #two continuous so can do scatter plot
+  ggplot (mapping=aes(x=period, y=total_catch)) + 
+  geom_point (na.rm = T, mapping = aes (color = period, shape=period)) + #TAKE OUT aes if not needed
+  geom_smooth (method = lm, se = T) + 
+  labs (title = "title", x = "name", y = "name", color = "name")
+         
+
+```
+  
+10. Perform one exploratory analysis of your choice. Make sure to clearly state the question you are asking before writing any code.
+```{r}
+
+```
+
+## Knit and Upload
+Please knit your work as an .html file and upload to Canvas. Homework is due before the start of the next lab. No late work is accepted. Make sure to use the formatting conventions of RMarkdown to make your report neat and clean!  

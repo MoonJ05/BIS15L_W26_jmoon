@@ -142,6 +142,7 @@ mutate(across(ends_with("mm"), ~./10)) #applies to all columns ending with ‘mm
 ##Data Rules / Cleaning Data
 
 ```{r}
+#check lab 8 fish clean for more! 
 #Use lowercase (everything)
 rename() #to change column names or using select() 
 Data_name <- data_name %>% clean_names()  #Cleans name and fixes everything! All lower case and spaces to underscores. 
@@ -149,6 +150,11 @@ Data_name <- data_name %>% clean_names()  #Cleans name and fixes everything! All
 Dataframe %>% mutate(across(c("var1", "var2"), tolower)) #to lower case… but numeric becomes char if included… 
 mutate(across(c(years_of_sample_collection, elephant_id, sex), as.factor)) #when changing type.. very similar 
 Datafame %>% mutate(across(where(is.character), tolower)) #safer
+
+#useful code: 
+elephants <- read_csv("data/elephants.csv") %>% 
+  clean_names() %>% 
+  mutate(across(where(is.character), as.factor))
 
 #Using ifelse… 
 
@@ -246,7 +252,7 @@ msleep %>%
   filter(bodywt>100) %>% #check to make sure each line is working before moving on 
   distinct() #gives list of distinct
 
-#distinct. 
+#distinct.... count 
 msleep %>% 
   filter(bodywt>100) %>% 
   summarize(n_genera=n_distinct(genus))
@@ -277,5 +283,40 @@ msleep %>%
   count(vore) %>% 
   ggplot(aes(x=vore, y=n)) + #count(vore) gives n 
   geom_col() #use this when we have an x and a y... geom_bar() is used when no y. 
+```
+
+##Group_by
+
+```{r}
+#utilized to more easily calculate mean, sd, etc. for different groups
+#can group by more than one variable. 
+elephants %>% 
+  group_by(years_of_sample_collection, sex) %>% 
+  summarize(mean_age = mean(estimated_age_years, na.rm = T), 
+            meadian = median(estimated_age_years, na.rm = T), 
+            standard_dev = sd(estimated_age_years, na.rm = T), 
+            n = n()) %>% 
+  arrange(sex)
+#getting rid of the error message 
+#if need to filter, always filter first. 
+elephants %>% 
+  group_by(years_of_sample_collection, sex) %>% 
+  summarize(mean_estimated_age_years = mean(estimated_age_years, 
+                                           na.rm = T), 
+            n=n(), 
+            .groups='keep') %>% #makes error message go away 
+              arrange(sex) 
+#if you run into one that gives weird numbers... you can view them this way: 
+msleep %>% 
+  filter(order == "Cetacea") %>% 
+  select(order, genus, brainwt) 
+
+#interesting one for reference 
+fisheries_clean %>% 
+  filter(period=="2023") %>%
+  group_by(common_name) %>% 
+  summarize(sum_catch = sum(catch, na.rm = T)) %>% 
+  arrange(desc(sum_catch)) %>% 
+  head(sum_catch, n =10)
 ```
 
