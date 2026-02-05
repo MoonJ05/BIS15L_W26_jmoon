@@ -222,6 +222,12 @@ ggplot(data = data_name,
 #use fill instead of color to fill inside bars. Fill can be a different categorical variable. 
 #mapping= aes() 		#anytime you want to add color or shape 
 
+#Barplot when we have specific y
+msleep %>% 
+  count(vore) %>% 
+  ggplot(aes(x=vore, y=n)) + #count(vore) gives n 
+  geom_col(mapping = aes (fill = x_var_name)) #use this when we have an x and a y... geom_bar() is used when no y. 
+
 ```
 
 ##Statistical Summaries
