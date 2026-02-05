@@ -35,6 +35,7 @@ getwd()    #checks current directory
 setwd("") 	#changes your working directory to "" 
 write.csv(data_name, "datafile.csv", row.names=FALSE)	#row.names avoid row numbers from printing out. Saves data frame data_name as .csv file 
 Data_name <- read.csv("datafile.csv")	 #import .csv file 
+#use read_csv
 y <- 3 		#assigns new value to object
 ?round 		#learn how to use function (ex. round) 
 X <- c(1, 2, 3)		#vector… ! can store multiple values (concatenate) 
@@ -144,6 +145,8 @@ mutate(across(ends_with("mm"), ~./10)) #applies to all columns ending with ‘mm
 ```{r}
 #check lab 8 fish clean for more! 
 #Use lowercase (everything)
+#no spaces!
+#seperate data into valriables (row), values, and columns (observations)
 rename() #to change column names or using select() 
 Data_name <- data_name %>% clean_names()  #Cleans name and fixes everything! All lower case and spaces to underscores. 
 #For observations itself: 
