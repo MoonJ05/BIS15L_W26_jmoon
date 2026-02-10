@@ -106,7 +106,7 @@ fisheries_clean %>%
   filter(common_name == "Alaska pollock(=Walleye poll.)") %>% 
   filter(period >= 2013, period <= 2023) %>% 
   group_by(period) %>% 
-  summarize(total_catch = sum(catch)) %>%  #two continuous so can do scatter plot
+  summarize(total_catch = sum(catch))  %>%  #two continuous so can do scatter plot
   ggplot (mapping=aes(x=period, y=total_catch)) + 
   geom_point (na.rm = T) + 
   geom_smooth (method = lm, se = F) + 
@@ -133,8 +133,6 @@ fisheries_clean %>%
   ggplot(aes (x = continent, y = total_catch)) +
   geom_col(mapping = aes(fill = continent)) + 
   labs (title = "Total Fishes Caught in Each Continent for 2023", x = "Continent", y = "Total Catch")
-
-  
 ```
 
 Asia had the most fishes caught overall... by a crazy high amount too. 

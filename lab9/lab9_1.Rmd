@@ -18,7 +18,7 @@ output:
 *At the end of this exercise, you will be able to:*    
 1. Explain the difference between tidy and messy data.  
 2. Evaluate a data set as tidy or messy.    
-3. Use the `pivot_longer()` function of `tidyr` to transform data from wide to long format.  
+3. Use the `pivot_longer()` function of `tidyr` to transform data from wide to lonfg format.  
 4. Use `separate()` to split observations within a column.  
 
 ## Overview

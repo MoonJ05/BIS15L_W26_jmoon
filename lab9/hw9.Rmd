@@ -1,6 +1,6 @@
 ---
 title: "Homework 9"
-author: "Your Name Here"
+author: "Jina Moon"
 date: "`r Sys.Date()`"
 output:
   html_document: 
@@ -49,41 +49,63 @@ sydneybeaches_long <- sydneybeaches %>%
 4. Pivot the data such that the dates are column names and each beach only appears once (wide format). Name the object `sydneybeaches_wide`
 ```{r}
 sydneybeaches_wide <- sydneybeaches_long %>% 
-  
+  pivot_wider(names_from= "Date", #makes the dates into column names
+              values_from ="Enterococci (cfu/100ml)") #puts the values under each date
 ```
 
 5. Pivot the data back so that the dates are data and not column names.
 ```{r}
-
+#assuming this is just practice... 
+sydneybeaches_wide %>% 
+  pivot_longer (-Site, 
+                names_to="Date", 
+                values_to="Enterococci")
 ```
 
 6. We haven't dealt much with dates yet, but separate the date into columns day, month, and year. Do this on the `sydneybeaches_long` data.
 ```{r}
-
+sydneybeaches_long <- sydneybeaches_long %>% 
+  separate(Date, into=c("day", "month", "year"), sep="/")
 ```
 
 7. What is the average `enterococci_cfu_100ml` by year for each beach. Think about which data you will use- long or wide.
 ```{r}
-
+#long probs
+avg_enterococci <- sydneybeaches_long %>% 
+  group_by(Site, year) %>% #group by is such a life save lwk 
+  summarize(avg_enterococci = mean(`Enterococci (cfu/100ml)`), 
+            na.rm = T,
+            .groups='keep')
 ```
 
 8. Make the output from question 7 easier to read by pivoting it to wide format.
 ```{r}
-
+avg_enterococci_wide <- avg_enterococci %>% 
+    pivot_wider(names_from= "year", #column names
+              values_from ="avg_enterococci") #puts the values under each column
+avg_enterococci_wide
 ```
 
 9. What was the most polluted beach in 2013?
 ```{r}
-
+avg_enterococci_wide %>% 
+  select(Site, `2013`) %>%  #number indicating which column... apparently need to do `` (backslash) for numbers
+  arrange(desc(`2013`)) 
 ```
 
-```{r}
-
-```
+It was the Little Bay Beach 
 
 10. Explore the data! Do one analysis of your choice that includes a minimum of three lines of code.  
 ```{r}
-
+#for the little Bay beach, has the pollution been increasing? decreasing...? lets do it by year
+avg_enterococci %>% 
+  select(Site, year, avg_enterococci)  %>% 
+  filter(Site== "Little Bay Beach") %>% 
+  mutate(year = as.numeric(year)) %>% #need to convert to continuous number for line. 
+  ggplot (mapping=aes(x=year, y=avg_enterococci)) + 
+  geom_point (na.rm = T) + 
+  geom_smooth (method = lm, se = F) + 
+  labs (title = "Pollution in Little Bay Beach over year", x = "years", y = "Average Enterococci (cfu/100ml)")
 ```
 
 ## Knit and Upload
