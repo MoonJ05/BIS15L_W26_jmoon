@@ -49,8 +49,7 @@ sharks %>%
 sharks %>% 
   select(county, incident_num) %>% 
   group_by(county) %>% 
-  summarize(incident_total = sum(incident_num)) %>% 
-  na.omit() %>% 
+  summarize(incident_total = sum(incident_num, na.rm = T)) %>% #removes NA before calculations, so it doesn't delete a whole county if I do omit.na ()
   ggplot (aes(x = county, y = incident_total)) +
   geom_col(aes(fill = county)) + 
   labs(title = "Total number of incidents per county", x = "county", y ="total number of incidents") + 
@@ -59,20 +58,45 @@ sharks %>%
 
 3. Are there months of the year when incidents are more likely to occur? Make a plot that shows the total number of incidents by month. Which month has the highest number of incidents?  
 ```{r}
-
+#hmm probably bar plot 
+sharks %>% 
+  mutate(month = as.factor(month)) %>% #convert to factors since barplot 
+  select(month, incident_num) %>% 
+  group_by(month) %>% 
+  summarize (incident_total = sum(incident_num, na.rm = T)) %>% 
+  ggplot (mapping=aes(x=month, y=incident_total)) + 
+  geom_col(aes(fill = month)) + 
+  labs(title = "Number of incidients by month", x = "month", y = "total # of incidents") + 
+  theme(plot.title = element_text(size=rel(1.5), hjust = .5)) 
 ```
 
-```{r}
+Yes there are months of the year where incidents are more likely to occur (mainly summer months, or ones near it). October has the highest number of incidents. 
 
-```
 
 4. Is there a time of day when most attacks occur? Make a plot that shows the total number of incidents by time of day. Which time of day has the highest number of incidents?  
 ```{r}
-
+#prob also barplot since has to do with count 
+sharks %>% 
+  mutate(time = as.factor(time)) %>% #convert to factors since bar plot 
+  select(time, incident_num) %>% 
+  separate(time, into= c("hour", "min"), sep=":") %>% 
+  group_by(hour) %>% #WONT KNIT SO IK ERROR IS THERE. email joel. 
+  summarize (incident_total = sum(incident_num, na.rm = T)) %>% 
+  ggplot (mapping=aes(x=hour, y=incident_total)) + 
+  geom_col(aes(fill = hour)) + 
+  labs(title = "Number of incidients by time of day", x = "time of day", y = "total # of incidents") + 
+  theme(plot.title = element_text(size=rel(1.5), hjust = .5)) + 
+  coord_flip()
 ```
 
 5. How do the number and types of injuries compare by county? Make a table that shows the number of injury types by county. Which county has the highest number incidents? (hint: your table should be in wide format)
 ```{r}
+
+sharks %>% 
+  select(county, injury, incident_num) %>% 
+  group_by(county) %>% 
+  pivot_wider(names_from = "injury",
+              values_from = "incident_num")
 
 ```
 
