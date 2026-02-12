@@ -1,6 +1,6 @@
 ---
 title: "Homework 10"
-author: "Key"
+author: "Jina Moon"
 date: "`r Sys.Date()`"
 output:
   html_document:
@@ -39,17 +39,19 @@ glimpse(sharks)
 1. Are there any "hotspots" for shark incidents in California? Show the top five counties with the most incidents.
 ```{r}
 sharks %>% 
-  select(county, incident_num) %>% 
-  slice_max(incident_num, n = 5)
+  select(county) %>%  
+  group_by(county) %>% 
+  summarize(incident_total = n()) %>% 
+  slice_max(incident_total, n = 5)
 ```
 
 2.  Make a plot that shows the total number of incidents per county.
 ```{r}
-#basically just a boxplot
+#basically just a barplot 
 sharks %>% 
-  select(county, incident_num) %>% 
+  select(county) %>%  
   group_by(county) %>% 
-  summarize(incident_total = sum(incident_num, na.rm = T)) %>% #removes NA before calculations, so it doesn't delete a whole county if I do omit.na ()
+  summarize(incident_total = n()) %>% 
   ggplot (aes(x = county, y = incident_total)) +
   geom_col(aes(fill = county)) + 
   labs(title = "Total number of incidents per county", x = "county", y ="total number of incidents") + 
@@ -61,9 +63,9 @@ sharks %>%
 #hmm probably bar plot 
 sharks %>% 
   mutate(month = as.factor(month)) %>% #convert to factors since barplot 
-  select(month, incident_num) %>% 
+  select(month) %>% 
   group_by(month) %>% 
-  summarize (incident_total = sum(incident_num, na.rm = T)) %>% 
+  summarize(incident_total = n()) %>% 
   ggplot (mapping=aes(x=month, y=incident_total)) + 
   geom_col(aes(fill = month)) + 
   labs(title = "Number of incidients by month", x = "month", y = "total # of incidents") + 
@@ -75,55 +77,100 @@ Yes there are months of the year where incidents are more likely to occur (mainl
 
 4. Is there a time of day when most attacks occur? Make a plot that shows the total number of incidents by time of day. Which time of day has the highest number of incidents?  
 ```{r}
+#we'll just remove the non numbers
 #prob also barplot since has to do with count 
+
 sharks %>% 
-  mutate(time = as.factor(time)) %>% #convert to factors since bar plot 
-  select(time, incident_num) %>% 
   separate(time, into= c("hour", "min"), sep=":") %>% 
-  group_by(hour) %>% #WONT KNIT SO IK ERROR IS THERE. email joel. 
-  summarize (incident_total = sum(incident_num, na.rm = T)) %>% 
+  mutate(hour = as.numeric(hour)) %>% #gets rid of non-numbers
+  select(hour) %>%
+  mutate(hour = factor(hour, levels = 23:0)) %>% #specified levels that I want using factor 
+  group_by(hour, .drop = F) %>% #added .drop = F to make it all values show up
+  summarize (incident_total = n()) %>% 
   ggplot (mapping=aes(x=hour, y=incident_total)) + 
   geom_col(aes(fill = hour)) + 
-  labs(title = "Number of incidients by time of day", x = "time of day", y = "total # of incidents") + 
+  labs(title = "Number of incidients by time of day (hour)", x = "time of day (hour)", y = "total # of incidents") + 
   theme(plot.title = element_text(size=rel(1.5), hjust = .5)) + 
   coord_flip()
 ```
 
+The most attacks seem to occur between 11 am and 12 pm. 
+For the plot I chose to ignore the min to make it more... visually readable. 
+
 5. How do the number and types of injuries compare by county? Make a table that shows the number of injury types by county. Which county has the highest number incidents? (hint: your table should be in wide format)
 ```{r}
-
-sharks %>% 
-  select(county, injury, incident_num) %>% 
-  group_by(county) %>% 
-  pivot_wider(names_from = "injury",
-              values_from = "incident_num")
-
+#table that shows # injury types by county 
+sharks_wide <- sharks %>% 
+  group_by(county, injury) %>% 
+  summarize(incident_total_type = n()) %>% 
+  pivot_wider(names_from= "injury",
+              values_from="incident_total_type") %>% 
+  mutate(across(where(is.numeric), ~ifelse(is.na(.), 0, .)))  %>%  #replaces na with 0 which works in this context
+  mutate(total_incidents = minor + none + major + `minor*` + `none*` + fatal + `major*`) %>% 
+  arrange(desc(total_incidents))
+sharks_wide
 ```
+
+San Diego... perhaps unsurprisingly... has the highest number incidents. 
+
 
 6. Use the table from #5 to make a plot that shows the total number of incidents by county.
 ```{r}
-
+sharks_wide %>% 
+  ggplot(aes(x = county, y = total_incidents)) +
+  geom_col(aes(fill = county)) +
+  coord_flip() + 
+  labs(title = "Total # of Incidents by County", x = "County", y = "Total Incidents")
 ```
 
 7. In the data, `mode` refers to a type of activity. Which activity is associated with the highest number of incidents?
 ```{r}
-
+sharks %>% 
+  group_by(mode) %>% 
+  summarize(activity_total = n()) %>% 
+  arrange(desc(activity_total))
 ```
+
+Surfing/Boarding is associated with the highest number of incidents. 
+
 
 8. Make a plot that compares the number of incidents by activity.
 ```{r}
+#bar plot but col since specific y
+sharks %>% 
+  group_by(mode) %>% 
+  summarize(activity_total = n()) %>% 
+  ggplot(aes(x = mode, y = activity_total)) +
+  geom_col(aes(fill = mode)) +
+  coord_flip() +
+  labs(title = "Number of Incidents by Activity", x = "Activity", y = "Total Incidents")
 
 ```
 
 9. Which shark species is involved in the highest number of incidents?  
 ```{r}
-
+sharks %>% 
+  mutate(species = tolower(species)) %>% #Blue is a weirdo 
+  group_by(species) %>% 
+  summarize(total_incident = n()) %>% 
+  arrange(desc(total_incident))
 ```
+
+The Great white shark is involved in the highest number of incidents. 
 
 10. Are all incidents involving Great White's fatal? Make a plot that shows the number and types of incidents for Great White's only.  
 ```{r}
-
+sharks %>% 
+  filter(species == "White") %>%  
+  group_by(injury) %>% 
+  summarize(incident_total_white = n()) %>% 
+  ggplot(aes(x = injury, y = incident_total_white)) +
+  geom_col(aes(fill = injury)) +
+  labs(title = "Incidents involving Great White Shark", x = "Injury", y = "Incident Total")
 ```
+
+No, not all incidents involving Great White sharks are fatal, and most of it tend to not be fatal. 
+
 
 ## Knit and Upload
 Please knit your work as an .html file and upload to Canvas. Homework is due before the start of the next lab. No late work is accepted. Make sure to use the formatting conventions of RMarkdown to make your report neat and clean! 
