@@ -52,23 +52,59 @@ There are 195 countries represented in the dataset.
 
 3. Which five countries have had the largest absolute population growth between 1925-2025? Show this as a table.
 ```{r}
-gapminder %>% #use mutate... 
-  select(country, pop)
+gapminder %>%
+  filter(year == 1925 | year == 2025) %>% 
+  select(country, year, pop) %>% 
+  pivot_wider(names_from="year",
+              values_from = "pop") %>% 
+  mutate(pop_growth = `2025` - `1925`) %>% 
+  arrange(desc(pop_growth)) %>% 
+  head(n = 5)
 ```
+
+India, China, Indonesia, Pakistan, and the USA had the largest absolute population growth between 1925-2025. 
+
 
 4. Make a plot that shows population growth over time for the top country you found in question #3.
 ```{r}
-
+#top country: India 
+gapminder %>% 
+  filter(country == "India") %>% 
+  arrange(year) %>% 
+  ggplot(aes(x= year, y = pop)) +
+  geom_point(na.rm = T, size = 1) +
+  geom_smooth(method = lm, se = F, color = "green4") + 
+  labs(title = "Populatin Growth Over Time, India", x = "Year", y = "Population") + 
+  theme(plot.title = element_text(hjust =0.5)) 
 ```
 
 5. Has global life expectancy changed between 1925 and 2025? Show the min, median, mean, and max for all countries (combined) in the dataset.
 ```{r}
-#all combined... 
+#for all combined
+gapminder %>%
+  filter(year == "1925" | year == "2025") %>% #looking at just these two so that it's not overwhelming
+  group_by(year) %>%
+  summarize(min = min(lex, na.rm = T),
+            median = median(lex, na.rm = T),
+            mean = mean(lex, na.rm = T),
+            max = max(lex, na.rm = T))
 ```
+
+
+Yes.... the global life expectancy has tremendously changed between 1925... People live a lot longer now (we basically have 30 more years to live life)
 
 6. Make a plot that shows the distribution of life expectancy for all countries in 1925 and 2025 (try using `geom_density`). What do you notice about the shift in life expectancy over time?
 ```{r}
 #two plots in the same graph
+gapminder %>%  
+  filter(year == 1925 | year == 2025)
+
+
+gap %>% 
+  filter(year ==1935) %>% 
+  ggplot(aes(x =lex)) +
+  geom_histogram(aes(y=after_stat(density)), color = "black", fill = "turquoise4") + 
+  geom_density(color = "red", alpha = 0.4)
 ```
 
 7. We are interested in the relationship between per capita GDP and life expectancy; i.e. does having more money help you live longer in 2025? Show this as a plot. (Suggestion! Remove Monaco as an extreme outlier.)
