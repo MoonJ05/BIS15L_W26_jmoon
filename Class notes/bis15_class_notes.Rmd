@@ -329,3 +329,12 @@ fisheries_clean %>%
   head(sum_catch, n =10)
 ```
 
+
+
+theme_solarized
+theme_foundation
+theme_clean
+theme_pander
+theme_few
+theme_stata
+theme_par

@@ -1,6 +1,6 @@
 ---
 title: "Homework 11"
-author: "Your Name Here"
+author: "Jina Moon"
 date: "`r Sys.Date()`"
 output:
   html_document:
@@ -21,6 +21,7 @@ Make sure to use the formatting conventions of RMarkdown to make your report nea
 ```{r message=FALSE, warning=FALSE}
 library(tidyverse)
 library(janitor)
+library(ggthemes) #added for theme
 ``` 
 
 ```{r}
@@ -75,7 +76,9 @@ gapminder %>%
   geom_point(na.rm = T, size = 1) +
   geom_smooth(method = lm, se = F, color = "green4") + 
   labs(title = "Populatin Growth Over Time, India", x = "Year", y = "Population") + 
-  theme(plot.title = element_text(hjust =0.5)) 
+  theme(plot.title = element_text(hjust =0.5)) +
+  theme_stata()
+
 ```
 
 5. Has global life expectancy changed between 1925 and 2025? Show the min, median, mean, and max for all countries (combined) in the dataset.
@@ -97,38 +100,77 @@ Yes.... the global life expectancy has tremendously changed between 1925... Peop
 ```{r}
 #two plots in the same graph
 gapminder %>%  
-  filter(year == 1925 | year == 2025)
+  filter(year == 1925 | year == 2025) %>% 
+  mutate(year = factor(year)) %>% 
+  ggplot(aes(x = lex, color = year, fill = year))+ 
+  geom_density(alpha = 0.4, na.rm = T, linewidth = 1) + 
+  labs(title ="Distribution of Life Expectancy, 1925 and 2025", 
+       x = "Life Expectancy (years)",
+       y = NULL,
+       color = "Year",
+       fill = "Year") +
+  theme(plot.title = element_text(hjust =0.5)) +
+  theme_stata()
 
-
-gap %>% 
-  filter(year ==1935) %>% 
-  ggplot(aes(x =lex)) +
-  geom_histogram(aes(y=after_stat(density)), color = "black", fill = "turquoise4") + 
-  geom_density(color = "red", alpha = 0.4)
 ```
 
 7. We are interested in the relationship between per capita GDP and life expectancy; i.e. does having more money help you live longer in 2025? Show this as a plot. (Suggestion! Remove Monaco as an extreme outlier.)
 ```{r}
-#... there is a lot of outlier... so maybe remove.... as country (especially Monaco)
+gapminder %>% 
+  filter(year == 2025 & country != 'Monaco') %>% #remove Monaco as extreme outlier 
+  ggplot(aes(x = gdp, y = lex)) +
+  geom_point (na.rm = T) + 
+  geom_smooth (method = lm, se = F, color = "green4", na.rm = T) + 
+  labs (title = "Per Capita GDP in Relation to Life Expectancy, 2025", x = "GDP", y = "Life Expectancy (years)") + 
+  theme(plot.title=element_text(hjust = 0.5)) +
+  theme_stata()
 ```
 
 8. Which five countries have had the highest absolute GDP per capita growth over the past 50 years? Show this as a table. (Suggestion! Remove Monaco as an extreme outlier.)
 ```{r}
-
+gdp_growth_gapminder <- gapminder %>% 
+  filter((year == 2025 | year == 2025-50) & country != "Monaco") %>% #effectively 2025 and 1975, removed Monaco
+  select(country, year, gdp) %>% 
+  pivot_wider (names_from = "year",
+               values_from="gdp") %>% #194 countries after taking out one so runs correctly 
+  mutate(gdp_growth = `2025` - `1975`) %>% 
+  arrange(desc(gdp_growth)) %>% 
+  head(n = 5)
+gdp_growth_gapminder
 ```
 
 9. How does per capita GDP growth compare between these same five countries over the past 50 years? Show this as a plot.
 ```{r}
-
+gdp_growth_gapminder %>% 
+  ggplot(aes(x = reorder(country, - gdp_growth), y = gdp_growth)) + #reordered from greatest to smallest
+  geom_col(aes (fill = country)) + 
+  labs(title = "Per Capita GDP Growth in Top Five Countries Over the Past 50 Years", x = "Country", y = "Per Capita GDP Growth", fill = "Country") + 
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  theme_stata()
 ```
 
 10. Do one analysis of your choice that includes a table and plot as outputs.
 ```{r}
+#Countries with most change in life expectancy in the last 50 years (top 10)
 
+lex_growth_gapminder <- gapminder %>% 
+  filter(year == 2025 | year == 2025-50) %>% #effectively 2025 and 1975
+  select(country, year, lex) %>% 
+  pivot_wider (names_from = "year",
+               values_from="lex") %>% 
+  mutate(lex_growth = `2025` - `1975`) %>% 
+  arrange(desc(lex_growth)) %>% 
+  head(n = 10)
+lex_growth_gapminder
 ```
 
 ```{r}
-
+lex_growth_gapminder %>% 
+  ggplot(aes(x = reorder(country, - lex_growth), y = lex_growth)) + #reordered from greatest to smallest
+  geom_col(aes (fill = country)) + 
+  labs(title = "Life Expectancy Growth in Top 10 Countries Over the Past 50 Years", x = "Country", y = "Life Expectancy Growth", fill = "Country") + 
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))
 ```
 
 ## Knit and Upload
