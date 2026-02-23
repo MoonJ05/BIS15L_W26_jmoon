@@ -306,15 +306,15 @@ elephants %>%
             standard_dev = sd(estimated_age_years, na.rm = T), 
             n = n()) %>% 
   arrange(sex)
-#getting rid of the error message 
 #if need to filter, always filter first. 
 elephants %>% 
   group_by(years_of_sample_collection, sex) %>% 
-  summarize(mean_estimated_age_years = mean(estimated_age_years, 
-                                           na.rm = T), 
-            n=n(), 
-            .groups='keep') %>% #makes error message go away 
-              arrange(sex) 
+  summarize(mean_estimated_age_years = mean(estimated_age_years, na.rm = T), 
+n=n(), 
+.groups='keep') #makes error message go away 
+
+
+
 #if you run into one that gives weird numbers... you can view them this way: 
 msleep %>% 
   filter(order == "Cetacea") %>% 
@@ -329,6 +329,7 @@ fisheries_clean %>%
   head(sum_catch, n =10)
 ```
 
+Continue from lab 8_2 in terms of notes
 
 
 theme_solarized
