@@ -88,7 +88,7 @@ ui <- fluidPage(
 server <- function(input, output, session) {
   output$plot <- renderPlot({
   msleep %>% 
-    filter(vore != NA) %>% 
+    filter(vore != "NA") %>% 
       ggplot(aes(x = vore,
                  y = .data[[input$y]],
              fill = vore)) + 
