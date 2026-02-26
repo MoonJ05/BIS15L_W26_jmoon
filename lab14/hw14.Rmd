@@ -1,6 +1,6 @@
 ---
 title: "Lab 14 Homework"
-author: "Please Add Your Name Here"
+author: "Jina Moon"
 date: "`r Sys.Date()`"
 output:
   html_document:
@@ -23,7 +23,7 @@ library(leaflet)
 
 ## API Key
 ```{r}
-register_stadiamaps("YOUR API KEY HERE", write = FALSE)
+register_stadiamaps("bf91d81b-2ad3-45b1-a217-21bb0a13f297", write = FALSE)
 ```
 
 ## Load the Data
@@ -37,15 +37,141 @@ sharks <- read_csv("data/SharkIncidents_1950_2022_220302.csv") %>%
 
 1. Use the range of the latitude and longitude to build an appropriate bounding box for your map.
 
+```{r}
+sharks %>% 
+  select(longitude, latitude) %>% 
+  summary()
+long_shark <- c(-124.7, -117.1)
+lat_shark <- c(32.59, 41.56)
+bbox_sharks <- make_bbox(long_shark, lat_shark, f=.03)
+```
+
 2. Load a map from `stamen` in a terrain style projection and display the map.  
+
+```{r}
+map_sharks <- get_stadiamap(bbox_sharks, maptype = "stamen_terrain", zoom=7)
+ggmap(map_sharks) #display
+```
 
 3. Build a map that overlays the recorded observations of shark attacks in California.  
 
+```{r}
+ggmap(map_sharks)+
+  geom_point(data=sharks, aes(longitude, latitude), size=.5, color="black", alpha=.8)+
+  labs(x="Longitude",y="Latitude",title="Observations of Shark Attacks in California")
+```
+
 4. Build a map that only shows the fatalities.  
 
-5. Build the same map (fatalities only), but this time make it interactive using `leaflet`. Also, color the points red.  
+```{r}
+ggmap(map_sharks)+
+  geom_point(data=sharks %>% filter(injury == "fatal"), aes(longitude, latitude), size=.5, color="black", alpha=.8)+ 
+  labs(x="Longitude",y="Latitude",title="Observations of Shark Attacks in California")
+```
+
+5. Build the same map (fatalities only), but this time make it interactive using `leaflet`. Also, color the points red. 
+
+```{r}
+sharks %>% 
+  summarise(
+    lon_min=min(longitude, na.rm = T),
+    lon_max=max(longitude, na.rm = T),
+    lat_min=min(latitude, na.rm = T),
+    lat_max=max(latitude, na.rm = T))
+```
+```{r}
+lon_min <- -124.7267	
+lon_max <- -117.1467	
+lat_min <- 32.58833	
+lat_max <- 41.56167	
+```
+
+```{r}
+fatal_sharks <- sharks %>% 
+  filter(injury == "fatal")
+
+leaflet(fatal_sharks) %>% 
+  addProviderTiles(providers$Stadia.StamenTerrain) %>% 
+  addCircleMarkers(
+    lng = ~longitude, 
+    lat = ~latitude,
+    radius = 2,
+    stroke = F,
+    fillOpacity = .9,
+    color = "red"
+  ) %>% 
+  addScaleBar(position="bottomleft") %>% 
+  fitBounds(lng1 = lon_min, lat1 = lat_min,
+            lng2 = lon_max, lat2 = lat_max)
+```
+
+
 
 6. Which county has the highest number of recorded shark attacks? Make a map that only shows the attacks in this county. (hint: it may help improve the map if you remove duplicate locations, i.e. multiple attacks at the same location.)
+
+```{r}
+sharks %>% 
+  group_by(county) %>% 
+  summarise(county_attacks = sum(n())) %>% 
+  arrange(desc(county_attacks)) %>% 
+  head(n = 1)
+```
+San Diego has the highest # recorded shark attacks
+
+```{r}
+#new Data with just San Diego shark attacks 
+SD_sharks <- sharks %>% 
+  filter(county == "San Diego") %>% 
+  distinct(latitude, longitude)
+```
+
+```{r}
+SD_sharks %>% 
+  summarise(
+    lon_min=min(longitude, na.rm = T),
+    lon_max=max(longitude, na.rm = T),
+    lat_min=min(latitude, na.rm = T),
+    lat_max=max(latitude, na.rm = T))
+```
+```{r}
+sd_lon_min <- -118.1	
+sd_lon_max <- -117.1467	
+sd_lat_min <- 32.58833	
+sd_lat_max <- 33.37
+```
+
+```{r}
+leaflet(SD_sharks) %>% 
+  addProviderTiles(providers$Stadia.StamenTerrain) %>% 
+  addCircleMarkers(
+    lng = ~longitude, 
+    lat = ~latitude,
+    radius = 2,
+    stroke = F,
+    fillOpacity = .9,
+    color = "red"
+  ) %>% 
+  addScaleBar(position="bottomleft") %>% 
+  fitBounds(lng1 = sd_lon_min, lat1 = sd_lat_min,
+            lng2 = sd_lon_max, lat2 = sd_lat_max)
+```
+Lwk realized the leaflet maps dont seem to show up fully on the html output so different map here too 
+```{r}
+sd_lon_min <- -118.1	
+sd_lon_max <- -117.1467	
+sd_lat_min <- 32.58833	
+sd_lat_max <- 33.37
+
+sd_long_shark <- c(-118.1, -117.1467)
+sd_lat_shark <- c(32.58833, 33.37)
+sd_bbox_sharks <- make_bbox(sd_long_shark, sd_lat_shark, f=.03)
+
+map_sharks_sd <- get_stadiamap(sd_bbox_sharks, maptype = "stamen_terrain", zoom=7)
+
+ggmap(map_sharks_sd)+
+  geom_point(data=SD_sharks, aes(longitude, latitude), size=.5, color="black", alpha=.8)+
+  labs(x="Longitude",y="Latitude",title="Observations of Shark Attacks in California")
+```
 
 ## Knit and Upload
 Please knit your work as an .html file and upload to Canvas. Homework is due before the start of the next lab. No late work is accepted. Make sure to use the formatting conventions of RMarkdown to make your report neat and clean! 
