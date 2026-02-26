@@ -36,17 +36,54 @@ glimpse(amniota)
 2. Make any necessary replacements in the data such that all NA's appear as "NA". 
 
 ```{r}
-
+amniota <-amniota %>%
+  replace_with_na_all(condition = ~.x %in% c(common_na_numbers, common_na_strings)) #should replace all, including -999 that seems most common
 ```
 
 
 3. How many total NA's are in the data set? Use the package `naniar` to produce a summary, including percentages, of missing data in each column for the `amniota` data.
 
+```{r}
+miss_var_summary(amniota)
+miss_var_summary(amniota) %>% 
+    summarize(total_missing = sum(n_miss))
+```
+
+There is a total of 528,379 NA's in the data set .... but after question 4, and correcting negative values, there are 528,383 NA's in the data set. 
+
+
 4. Double check your replacement using `summary`. Do you see any other potential issues? If so, fix them.
+
+```{r}
+#minimum for female_matruity_d shouldn't be negative.... 
+amniota <- amniota %>% 
+  mutate(female_maturity_d = ifelse(female_maturity_d < 0, NA, female_maturity_d)) #fix issue
+
+summary(amniota)
+
+miss_var_summary(amniota) %>% 
+    summarize(total_missing = sum(n_miss))
+```
 
 5. Use `naniar` to visualize the number of NA's in each variable. Which variables have the most NA's?
 
+```{r}
+amniota %>% 
+  gg_miss_var()
+```
+Subspecies, and female body mass at maturity has the most NA's. 
+
+
 6. Calculate the number of NAs in the `egg_mass_g` column sorted by taxonomic class; i.e. how many NA's are present in the `egg_mass_g` column in birds, mammals, and reptiles? Does this results make sense biologically? How do these results affect your interpretation of NA's?
+
+```{r}
+amniota %>% 
+  group_by(class) %>% 
+  miss_var_summary() %>% 
+  filter(variable == "egg_mass_g") 
+```
+
+All the egg mass for Mammalia is NA, and followed by most NAs in Reptilia, and then Aves has the least NA percent wise. Biologically, it makes sense that Mammalia has the most NA, since they don't lay eggs. I was a little surprised that aves has less NA that Reptilia, but upon researching, it made sense why (many reptiles apparently don't actually lay eggs, and they're harder to find). This interpretation affects my interpreation of NA's in that, NA's might not just mean no data collected, but that there is no available data to even collect to begin with. 
 
 ## Knit and Upload
 Please knit your work as an .html file and upload to Canvas. Homework is due before the start of the next lab. No late work is accepted. Make sure to use the formatting conventions of RMarkdown to make your report neat and clean! 
