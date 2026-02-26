@@ -80,7 +80,7 @@ shinyApp(ui, server)
 Done and saved in repository. 
 
 code copied here in case access is easier here..
-```{r}
+
 library(tidyverse)
 library(janitor)
 library(shiny)
@@ -126,7 +126,6 @@ server <- function(input, output, session) {
 }
 
 shinyApp(ui, server)
-```
 
 ## Knit and Upload
 Please knit your work as an .html file and upload to Canvas. Homework is due before the start of the next lab. No late work is accepted. Make sure to use the formatting conventions of RMarkdown to make your report neat and clean!
