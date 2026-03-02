@@ -187,6 +187,9 @@ class(object)		#gives you what type of data you are working with
 is.integer(object)	#checks T/F if specific type
 as.integer(object)	#converts to integer
 hotsprings$scientist <- as.factor (hotsprings$scientist)	#converts to factor 
+#to do this for the whole row...
+mutate(across(where(is.character), as.factor))
+
 levels(data$variable)	#checks for level
 table(data$variable)	#gives level and count
 # NA is filled in for missing … is.na(object) checks boolean 
@@ -329,8 +332,63 @@ fisheries_clean %>%
   head(sum_catch, n =10)
 ```
 
-Continue from lab 8_2 in terms of notes
+##Learning more about data 
 
+```{r}
+#to figure out num different
+summarize(n_distinct=n_distinct(column_name)) # you can summarize more than one, but comma
+#other applicaitons fo summarize
+summarize(sum = sum(catch, na.rm = T))
+
+```
+
+##Pivoting Data
+```{r}
+#up and down = variables. 
+#left to right are the observations
+#individually they are values 
+
+#if the column (aka variables), need to be part of observations use pivot longer e. 
+heartrate_long <- heartrate %>% 
+  pivot_longer(-patient, #what stays fixed
+               names_to="drug", #puts the column names under this name instead
+               values_to = "heartrate",
+               values_drop_na = T) #the values are redefined more precisely 
+#in pivot longer there are different ways to pivot. in the first section you can...
+wk1:wk76 #specify range you want to make longer
+-c(x,y,z) #specify columns that you want to stay fixed
+#identity columns by prefix, remove prefix  
+billboard %>% 
+  pivot_longer(
+    cols=starts_with("wk"),
+    names_to = "week",
+    names_prefix = "wk", #gets rid of the prefix 
+    values_to="rank",
+    values_drop_na = T
+  )
+#when more than one variable in a column name... 
+data %>% 
+  pivot_longer(
+    letter_a:letter_b, #for these columns
+    names_to = c("letter", "alphabet") #new variable names (what they will split into)
+    names_sep = "-" #what the names are seperated by 
+    values_to = "mRna" #aka what the values are actually a stand in for (bbp, etc.)
+  )
+#to make it more tidy, and get rid of prefix... 
+qpcr_tidy %>% 
+  separate(experiment, into = c("experiment", "e_number"), sep=3) %>% #sep = 3, is what index it seperates at.... exp1... at 3 so at p. 
+  separate(replicate, into=c("rep", "r_number"), sep = 3) %>% 
+  select(gene, experiment=e_number, replicate = r_number, 'mRNA expression')
+```
+
+
+
+```{r}
+
+```
+
+Continue from lab 8_2 in terms of notes
+Download Joel's data to mine just in case too! 
 
 theme_solarized
 theme_foundation
