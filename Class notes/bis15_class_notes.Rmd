@@ -7,12 +7,6 @@ output:
     theme: spacelab
 ---
 
-## Load the tidyverse
-```{r message=FALSE, warning=FALSE}
-library("tidyverse")
-library("janitor")
-```
-
 ##Computer Hygeine
 
 Sometimes I suppose it is good to keep my desktop, tabs, and physical laptop clean– 
@@ -27,6 +21,27 @@ https://github.com/MoonJ05/BIS15L_W26_jmoon.git ← link to my repository
 * Command + option + i creates a code chunk 
 * Command + return runs
 * command + shift + 'm' gets %>% 
+
+##Libraries to load
+```{r message=FALSE, warning=FALSE}
+library("tidyverse")
+library("janitor")  #for cleaning
+library("ggthemes") #for themes
+library("naniar") #for NAs
+library("RColorBrewer")
+library("paletteer") #for color palettes 
+library("lubridate") #this will help us manage dates
+library(ggmap) #for maps
+library(leaflet) #for leaflet 
+library("shiny") #shiny app
+library(shinydashboard)
+library(shinythemes)
+
+
+#Stamen API key
+register_stadiamaps("bf91d81b-2ad3-45b1-a217-21bb0a13f297", write = FALSE)
+#needed for maps 
+``` 
   
 ##Basic commands
 
@@ -240,6 +255,9 @@ msleep %>%
 
 ```{r}
 #when you want summaries in one line. 
+#filter when you want a specific value from variable
+#select when you want to narrow variables you are looking at
+
 msleep %>% 
   filter(bodywt>150) %>% 
   summarize(mean_bodywt_lg=mean(bodywt))
@@ -348,6 +366,8 @@ summarize(sum = sum(catch, na.rm = T))
 #left to right are the observations
 #individually they are values 
 
+#pivot longer: when column names represent variables. 
+
 #if the column (aka variables), need to be part of observations use pivot longer e. 
 heartrate_long <- heartrate %>% 
   pivot_longer(-patient, #what stays fixed
@@ -379,17 +399,241 @@ qpcr_tidy %>%
   separate(experiment, into = c("experiment", "e_number"), sep=3) %>% #sep = 3, is what index it seperates at.... exp1... at 3 so at p. 
   separate(replicate, into=c("rep", "r_number"), sep = 3) %>% 
   select(gene, experiment=e_number, replicate = r_number, 'mRNA expression')
+
+#seperate()
+  seperate (patient, into=c("patient", "gender"), sep = "_") #column, new column, separator
+#we can also do sep = -1 (split at the last character)
+#further clean patient_f by...
+  mutate(patient=str_remove(patient, "_")) #mutates
+#unite is the opposite of seperate()...
+  unite(patient_gender, "patient", "gender", sep="_")
+  
+#pivot wider... use when variable names are nder values. 
+  pivot_wider(names_from = "key", #new column names 
+              values_from= "value") 
 ```
 
+## REVIEW of plots 2.1 
+```{r}
+#geom_bar. when you only have one variable
 
+ggplot(data = life_history, 
+       mapping = aes (x = order)) + 
+  geom_bar (mapping = aes(fill = order)) + 
+  labs (title = "order count", x = "order", y = "count") +
+  coord_flip() #add so that you can actually read the order names 
+
+#geom_col for when you have x and y variable 
+
+life_history %>% 
+  count(order) %>% 
+  ggplot(aes(x=order, y =n)) + 
+  geom_col(aes(fill = order)) +
+  coord_flip()
+
+#bar plot using summarize 
+
+life_history %>% 
+  group_by(order) %>% 
+  summarize(avg_mass = mean(mass,  na.rm = T)) %>% #adds another variable for order group
+  arrange(desc(avg_mass)) %>% 
+  ggplot(aes(x = order, y = avg_mass)) + #ggplot(aes(x=reorder(order, avg_mass), y = avg_mass)) reorders it so x-axis label is more readable 
+  geom_col(aes(fill = order)) + 
+  coord_flip() +
+  scale_y_log10()
+options(scipen=999) #cancels scientific notation for the session
+
+#another way of scaling
+ggplot (data= life_history, 
+	mapping=aes(x= order, y=log10(mass)))
+
+#scatter plot (two continuous)
+life_history %>% 
+ggplot (mapping=aes(x=mass, y=litter_size)) + 
+  geom_point (na.rm = T) + 
+  scale_x_log10()+
+  geom_smooth (method = lm, se = T, na.rm = T) + 
+  labs( title="Mass vs. litter size", 
+        x="Mass(g)", 
+        y="Litter size") + #y = NULL means no label at all 
+  theme(plot.title = element_text(size=rel(1.5), hjust = .5)) #making it relative to others by 1.5 times bigger.. also adjust horizontal placement to .5 (middle)
+
+
+#aesthetics of plots
+geom_point (size = 3, color = "black", alpha=0.8, shape = 24, fill = "blue")transparency #sizing and color, etc. alpha controls transparency (shape is 0 to 24) 
+
+colors() #shows all the colors
+
+homerange %>% 
+  count(taxon, sort = T) #sorts! whoaaa. rearrange from largest to smallest
+
+#stacked bar plot (abomination )
+homerange %>% 
+  ggplot(aes(x = taxon, fill=trophic_guild)) + #abomination of the century 
+  geom_bar()
+#better = dodge 
+homerange %>% 
+  ggplot(aes(x = taxon, fill=trophic_guild)) + #abomination of the century 
+  geom_bar(position = "dodge")+ #always better to hae side by side
+#to orient vertically: 
+    theme(axis.text.x = element_text(angle = 45, hjust=0.85)) #whoa 
+
+#can scale to percentage too. 
+homerange %>% 
+  ggplot(aes(x=taxon, fill = trophic_guild)) + 
+  geom_bar(position=position_fill()) + 
+  scale_y_continuous(labels=scales::percent)+
+  coord_flip()
+# GET RID OF NA
+na.omit()
+
+#group. 
+#similar to fill but without color. Groups data for plotting 
+homerange %>% 
+  ggplot(aes(x=class, y =log10_mass, group= taxon)) + #can be useful, but fill does the same thing but better mot of the times... 
+  geom_boxplot()
+
+
+#some examples of applicaiton 
+#number incidents per month. 
+sharks %>% 
+  mutate(month = as.factor(month)) %>% #convert to factors since barplot 
+  select(month) %>% 
+  group_by(month) %>% 
+  summarize(incident_total = n()) %>% 
+  ggplot (mapping=aes(x=month, y=incident_total)) + 
+  geom_col(aes(fill = month)) + 
+  labs(title = "Number of incidients by month", x = "month", y = "total # of incidents") + 
+  theme(plot.title = element_text(size=rel(1.5), hjust = .5)) 
+
+#time of day 
+sharks %>% 
+  separate(time, into= c("hour", "min"), sep=":") %>% 
+  mutate(hour = as.numeric(hour)) %>% #gets rid of non-numbers
+  select(hour) %>%
+  mutate(hour = factor(hour, levels = 23:0)) %>% #specified levels that I want using factor 
+  group_by(hour, .drop = F) %>% #added .drop = F to make it all values show up
+  summarize (incident_total = n()) %>% 
+  ggplot (mapping=aes(x=hour, y=incident_total)) + 
+  geom_col(aes(fill = hour)) + 
+  labs(title = "Number of incidients by time of day (hour)", x = "time of day (hour)", y = "total # of incidents") + 
+  theme(plot.title = element_text(size=rel(1.5), hjust = .5)) + 
+  coord_flip()
+
+#table that shows # injury types by county 
+sharks_wide <- sharks %>% 
+  group_by(county, injury) %>% 
+  summarize(incident_total_type = n()) %>% 
+  pivot_wider(names_from= "injury",
+              values_from="incident_total_type") %>% 
+  mutate(across(where(is.numeric), ~ifelse(is.na(.), 0, .)))  %>%  #replaces na with 0 which works in this context
+  mutate(total_incidents = minor + none + major + `minor*` + `none*` + fatal + `major*`) %>% 
+  arrange(desc(total_incidents))
+sharks_wide
+```
+
+## Line plots, histograms, and density plots
 
 ```{r}
+#for a scatter plot with line 
+gap %>% 
+  filter((year>=2000 & year <= 2025) & country == "USA") %>% 
+  ggplot(aes(x = year, y = gdp)) +
+  geom_line(color = "red")+ 
+  geom_point(shape = 5) +
+  scale_x_continuous(breaks = 2000:2025, minor_breaks= NULL)+ #(breaks = seq(2000, 2025, by =5), minor_breaks = NULL)
+  theme(axis.text.x = element_text(angle = 60, hjust =1)) + 
+  labs(title = "GDP per Capita in the USA, 2000-2025", 
+       x = "year",
+       y = "GDP")
 
+#Histograms. shows distribution of continuous variables. Stores things like bins. should try histogram for the birds data with scale x. 
+gap %>% 
+  filter(year ==1935) %>% 
+  ggplot(aes(x = lex)) + 
+  geom_histogram(color = "black", fill="turquoise4", bins = 30) + 
+  labs(title="Distribution of Life Expectancy")
+
+#density plots. Uses smoothing function though like histogram to make distribution more clean looking 
+gap %>% 
+  filter(year ==1935) %>% 
+  ggplot(aes(x = lex)) + 
+  geom_density(color = "black", fill="turquoise4", alpha = 0.4) + 
+  labs(title="Distribution of Life Expectancy")
+
+#can put histogram and density plot together... 
+gap %>% 
+  filter(year ==1935) %>% 
+  ggplot(aes(x =lex)) +
+  geom_histogram(aes(y=after_stat(density)), color = "black", fill = "turquoise4") + 
+  geom_density(color = "red", alpha = 0.4) 
+
+
+#BIRD - could do something like this for most different months.... to show difference between seasons. 
+gap %>% 
+  filter(year==1930 | year == 1950) %>% #could do year %n% c(1930, 1950)
+  mutate(year = factor(year)) %>% #they need to be in factors for them to be sepearte! 
+  ggplot(aes(x = lex, color = year, fill=year)) + 
+  geom_density(alpha = 0.3) + 
+  labs(title ="Distribution of Life Expectancy, 1930 and 1950", 
+       x = "Life Expectancy (years)",
+       y = NULL,
+       color = "Year",
+       fill = "Year")
+
+#creating categories with mutate and case_when... from dplyr.
+income_cat2000 <- gap %>% 
+  filter(year ==2000) %>%#creates new income categories based on data. 
+  mutate(income_category = case_when(gdp<=1100 ~ "low",
+                                     gdp > 1100 & gdp <= 4500 ~ "low_middle",
+                                     gdp > 4500 & gdp <=13900 ~ "upper_middle",
+                                     gdp > 13900 ~ "high")) %>% #looks at numeric and categorizes it
+  select(country, gdp, income_category) %>% 
+  mutate(income_category = factor(income_category,
+                                  levels=c("low",
+                                           "low_middle",
+                                           "upper_middle",
+                                           "high")))
 ```
 
-Continue from lab 8_2 in terms of notes
-Download Joel's data to mine just in case too! 
+## Plots and Aesthetics 
 
+```{r}
+#adding lines to graph (grid)
+p + theme_linedraw()+ #draws in the lines 
+  theme(axis.text.x = element_text(angle = 60, hjust=1))
+
+#q
+q <- homerange %>% 
+  drop_na(log10_mass, log10_preymass) %>% #drop na first! 
+  ggplot (aes(x=log10_mass, y=log10_preymass, color = thermoregulation)) + 
+  geom_point (na.rm = T) + 
+  geom_smooth (method = lm, se = F, color = "blue")
+q
+#making it clean
+q + theme_classic()
+
+#legneds. 
+p+theme_linedraw()+
+  theme(legend.position = "bottom", #top, bottom, left, right, none
+        axis.text.x = element_text(angle = 60, hjust=1))+
+  labs(title = "Observations by Taxon in Homerange Data",
+       x = NULL,
+       y= "n",
+       fill= "Trophic Guild")
+
+#ggthemes. library(ggthemes) has more!
+p + 
+  theme_few()+
+  theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 60, hjust=1))+
+  labs(title = "Observations by Taxon in Homerange Data",
+       x = NULL,
+       y= "n",
+       fill= "Trophic Guild") +
+  theme_excel()
+
+#some themes
 theme_solarized
 theme_foundation
 theme_clean
@@ -397,3 +641,387 @@ theme_pander
 theme_few
 theme_stata
 theme_par
+#etc. etc. 
+
+#RcolorBrewer 
+#scale_colour_brewer is for points, scale_fill_brewer() is for fills 
+p+scale_fill_brewer(palette = "Accent")+ #added brewer
+  theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 60, hjust=1))+
+  labs(title = "Observations by Taxon in Homerange Data",
+       x = NULL,
+       y= "n",
+       fill= "Trophic Guild") 
+
+#Paleteer  - used to buid custom palette
+my_palette <- paletteer_d("ggprism::plasma") #package::palette
+
+#in action 
+p+scale_fill_manual(values=my_palette)+ #calls the palette
+  theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 60, hjust=1))+
+  labs(title = "Observations by Taxon in Homerange Data",
+       x = NULL,
+       y= "n",
+       fill= "Trophic Guild")
+
+#can also use hex code to custom color... 
+my_cols <- c("#66CDAA",
+             "#FFCD00FF")
+show_col(my_cols)
+
+#faceting 
+#AMAZING. allws you to make multi-panel plots for easy comparison 
+homerange %>% 
+  ggplot(aes(x = taxon, y = log10_mass, fill = thermoregulation)) +
+  geom_boxplot() + 
+  facet_wrap(~trophic_guild, ncol= 2, labeller = label_both) + #use nrow = 2 to make it up and down 
+  theme(axis.text.x = element_text(angle = 60, hjust = 1),
+        legend.position = "none",
+        strip.text = element_text())
+#facet_wrap makes a ribbon of panels by specified categorial variable. u can arrange them as wanted 
+#facet_grid allows control over the faceted variables. can make comparison of two categorical variables. a~b, a is rows, b is columns 
+homerange %>% 
+  ggplot(aes(x = taxon, y = log10_mass, fill = thermoregulation)) +
+  geom_boxplot() + 
+  facet_grid(trophic_guild~thermoregulation, labeller = label_both) + #can do two things at once..
+  theme(axis.text.x = element_text(angle = 60, hjust = 1),
+        legend.position = "none",
+        strip.text = element_text(size = 8, face ="bold"))
+#BIRDS. facet maybe for cloud, etc. 
+
+#random stuff. 
+gapminder %>% 
+  distinct(country) %>% #takes out distinct country
+  n_distinct() #outputs the number 
+```
+
+##Dealing with NA's
+```{r}
+#first see if there are NA's
+glimpse(life_history)
+summary(life_history) #make sure values that shouldn't be negative arent 
+
+life_history %>% 
+  summarize(across(everything(), ~sum(is.na(.))))
+
+#sometimes NA can be represented as -999 or even 0 
+#replacing as NA... 
+life_history_no_nas <- life_history_no_nas %>% 
+  mutate(max_life=na_if(max_life, 0)) #check before updating 
+
+#summary of NA across data frame
+miss_var_summary(life_history_no_nas) #number and percent
+#visual to help evaluate
+life_history_no_nas %>% 
+  gg_miss_var()
+
+#or as a scatter plot... 
+life_history_no_nas %>% 
+  ggplot(aes(x=log10(mass), y = log10(wean_mass))) + 
+  geom_point()+ 
+  geom_miss_point() #idea of how much in each is missing
+
+life_history_no_nas %>% 
+  group_by(order) %>% 
+  miss_var_summary(order =T)
+
+#what to replace with na.... 
+life_history %>% #going back to the original data
+  replace_with_na(replace = list(newborn = "not measured", 
+                                 weaning= -999, 
+                                 wean_mass= -999, 
+                                 afr= -999, 
+                                 max_life= 0, 
+                                 litter_size= -999, 
+                                 gestation= -999, 
+                                 mass= -999)) %>% 
+miss_var_summary()
+
+#or with a specific value 
+life_history %>% 
+  replace_with_na_all(condition = ~.x == -999) %>% 
+  miss_var_summary()
+
+#easiest way to do it lwk 
+life_history %>%
+  replace_with_na_all(condition = ~.x %in% c(common_na_numbers, common_na_strings)) %>%
+  mutate(newborn = na_if(newborn, "not measured")) #to na if "not measured"
+```
+
+##Joining and formatting data in data frame
+```{r}
+#join_type(firstTable, secondTable, by=columnTojoinOn)
+
+#inner join keeps rows that have matching values in both tables. ... if only exist in one = drop
+inner_join(table_A, table_B, by = "customer_ID")
+
+#left join keeps all row in first (left) table, and only matching rows in the second. if no match fills in with NA
+left_join(table_A, table_B, by = "customer_ID")
+
+#right join.... opposite of left join 
+right_join(table_A, table_B, by = "customer_ID")
+
+#full join keeps all rows in both tables and fills in NA where no match 
+full_join(table_A, table_B, by = "customer_ID")
+
+#anti join provides row in frst table for which there are not matching values in the second table 
+anti_join(table_A, table_B, by = "customer_ID") #use to troubleshoot prolematic joint
+
+```
+
+## dates
+```{r}
+today() #current date
+now() #current date and time 
+
+#date and time can be formatted in multiple ways... 20200922 170000 etc. 
+#can convert each using lubricate
+mdy(09-22-2020)
+dmy(22092007)
+mdy_hms(month day year hour min sec)
+#basically changes it to r format 
+
+#saving final data to a '.csv'
+write.csv(spider_date_cleaned,"spiders_with_locs.csv", row.names=FALSE)
+```
+
+##Maps
+```{r}
+#BBOX 
+#figure out dimensions. 
+spiders %>% 
+  select(latitude,longitude) %>% 
+  summary()
+#create bbox 
+lat <- c(34.67, 41.8)
+long <- c(-124.1,-115.5)
+bbox <- make_bbox(long, lat, f=.03)
+#make map. 
+map1 <- get_stadiamap(bbox, maptype = "stamen_terrain", zoom=7)
+#taking a look 
+ggmap(map1)
+#adding points 
+ggmap(map1)+
+  geom_point(data=spiders, aes(longitude, latitude), size=.5, color="black", alpha=.8)+ #always long and then lat 
+  labs(x="Longitude",y="Latitude",title="CA Usofila records")
+
+#LEAFLET - interactive map 
+spiders %>% 
+  summarise(
+    lon_min=min(longitude, na.rm = T),
+    lon_max=max(longitude, na.rm = T),
+    lat_min=min(latitude, na.rm = T),
+    lat_max=max(latitude, na.rm = T))
+#add to new variable
+lon_min <- -124.13
+lon_max <- -115.49
+lat_min <- 34.67
+lat_max <- 41.8
+#build
+leaflet(spiders) %>% 
+  addProviderTiles(providers$Stadia.StamenTerrain) %>% 
+  addCircleMarkers(
+    lng = ~longitude, 
+    lat = ~latitude,
+    radius = 2,
+    stroke = F,
+    fillOpacity = .7
+  ) %>% 
+  addScaleBar(position="bottomleft") %>% 
+  fitBounds(lng1 = lon_min, lat1 = lat_min,
+            lng2 = lon_max, lat2 = lat_max)
+```
+
+##Shiny App 
+```{r}
+#skeleton 
+#shortcut is 'shinyapp + shift + tab
+ui <- fluidPage(
+  
+)
+
+server <- function(input, output, session) {
+  
+}
+
+shinyApp(ui, server)
+
+#example done 
+
+#UI 
+ui <- fluidPage(
+  selectInput("x",
+              "Select X Variable",
+              choices = c("bill_length_mm",
+                          "bill_depth_mm",
+                          "flipper_length_mm",
+                          "body_mass_g"),
+              selected="bill_length_mm"),
+  
+  selectInput("y",
+              "Select Y Variable",
+              choices = c("bill_length_mm",
+                          "bill_depth_mm",
+                          "flipper_length_mm",
+                          "body_mass_g"),
+              selected="bill_depth_mm"),
+  
+  checkboxInput("show_lm",
+                "Show best-fit line(lm)",
+                value=FALSE),
+  
+  plotOutput("plot",
+             width="500px",
+             height="400px")
+)
+
+#SERVER
+server <- function(input, output, session) {
+
+  output$plot <- renderPlot({
+    
+    ggplot(penguins,
+           aes(x = .data[[input$x]],
+               y = .data[[input$y]]))+ #safer way to explicitly tell shiny to treat it like data
+      geom_point(na.rm=T)+
+      if (input$show_lm)
+        geom_smooth(method="lm", se=F, na.rm=T)
+    else
+      NULL
+            })
+}
+
+#RUN APP 
+
+shinyApp(ui, server)
+
+#^ scatter plot. 
+# for bar plot... 
+ui <- fluidPage(
+  
+  radioButtons("x",
+               "Select Fill Variable",
+               choices=c("trophic_guild",
+                         "thermoregulation"),
+               selected="trophic_guild"),
+  
+  plotOutput("plot")
+)
+
+server <- function(input, output, session) {
+  
+  output$plot <- renderPlot({
+    
+    ggplot(data=homerange,
+           aes_string(x="locomotion", fill=input$x))+
+      geom_bar(position="dodge", alpha=0.8, color="black")+
+      labs(x=NULL, y=NULL, fill="Fill Variable")
+  })
+  
+}
+
+shinyApp(ui, server)
+
+#box plot wiht theme 
+ui <- fluidPage(
+  
+  theme=shinythemes::shinytheme("cosmo"), #can add default themes. search up shiny theme. 
+  
+  selectInput("y",
+              "Select Sleep Variable",
+              choices = c("sleep_total", "sleep_rem", "sleep_cycle", "awake"),
+              selected = "sleep_total"),
+  
+  plotOutput("plot", width = "600px", height = "500px")
+)
+
+server <- function(input, output, session) {
+  output$plot <- renderPlot({
+  msleep %>% 
+    filter(vore != "NA") %>% 
+      ggplot(aes(x = vore,
+                 y = .data[[input$y]],
+             fill = vore)) + 
+      geom_boxplot(alpha = 0.75) +
+      labs(title = "Sleep Variables by Vore Type",
+           x = "Vore",
+           fill = "Vore Type") +
+      theme_minimal()
+  })
+}
+
+shinyApp(ui, server)
+
+#density 
+ui <- fluidPage(
+  titlePanel("Distribution by Order"),
+  theme=shinythemes::shinytheme("cosmo"), #can add default themes. search up shiny theme. 
+  
+# helptext("asdfsdf") <- can use for source 
+  
+  selectInput("x",
+              "Select Order",
+              choices = sort(unique(gestation$order)), #gets rid of mistakes by sorting it and getting unique
+              selected = "Afrosoricida"),
+  
+  selectInput("y",
+              "Select Variable of Interest",
+              choices = c("bodymass", "longevity", "gestationlength"),
+              selected = "gestationlength"),
+  
+  plotOutput("plot", width = "600px", height = "500px")
+)
+
+server <- function(input, output, session) {
+  output$plot <- renderPlot({
+    
+    gestation %>% 
+      filter(input$x == .data[["order"]]) %>%
+      ggplot(aes(.data[[input$y]])) + 
+      geom_density(alpha = 0.4, fill = "green4", color = "black") + 
+      theme_minimal() + 
+      theme(plot.title = element_text(hjust =0.5))
+  })
+}
+
+shinyApp(ui, server)
+
+#side bar and other aesthetics 
+ui <- dashboardPage(
+  
+  dashboardHeader(title = "Distribution of Gestation Length by Order"),
+  
+  dashboardSidebar(
+    
+     selectInput("x",
+              "Select Order",
+              choices = sort(unique(gestation$order)), #gets rid of mistakes by sorting it and getting unique
+              selected = "Afrosoricida"),
+    
+    selectInput("y",
+              "Select Variable of Interest",
+              choices = c("bodymass", "longevity", "gestationlength"),
+              selected = "gestationlength")
+    ), #puts above into sidebar 
+  
+  dashboardBody(  
+    plotOutput("plot", width = "600px", height = "500px")
+  )
+  
+)
+
+server <- function(input, output, session) {
+  output$plot <- renderPlot({
+    
+    gestation %>% 
+      filter(input$x == .data[["order"]]) %>% #basically sets the x variable columns 
+      ggplot(aes(.data[[input$y]])) + 
+      geom_density(alpha = 0.4, fill = "green4", color = "black") + 
+      theme_minimal() + 
+      theme(plot.title = element_text(hjust =0.5))
+  })
+}
+
+shinyApp(ui, server)
+```
