@@ -7,6 +7,43 @@ output:
     theme: spacelab
 ---
 
+6. (3 points) As explained above, the ratio of `urea_nitrogen` to `creatinine` is used as an index of fasting. To calculate the ratio, we need to multiply `urea_nitrogen` by 0.466, then divide by `creatinine`. Create a new variable called `un_creat_ratio` that contains this calculation.
+## MIDTERM 2 NOTES
+```{r}
+study = fasting beahvior of polar bears in SB and CS. 
+1983 to 2017
+BUN is blood urea nitrogen
+cretinine 
+... use to calculate ratio that indicates whether bear = fasting 
+#abstract.... 
+more than 7 days... 1448 samples from 1177 adults and subadult bears... should check result to paper later (highlighted) 
+
+popn --> population which ber belongs
+lat and long for ltitude and longitude
+
+#NA...
+bear id shouldn't have any 
+date is date
+
+
+```
+
+## The variables include:  
+- `bear_id`: A unique number given to each bear.    
+- `capture_date`: The data when the bear was tranquilized and assessed.  
+- `popn`: The population to which the bear belongs.  
+- `sex `: Sex of each bear.    
+- `age_class`: The age class of each bear (A=adult, S=subadult).   
+- `mating`: Whether or not the bear is pursuing a mate.  
+- `denning`: Whether or not the bear denned last year.  
+- `lat`: Latitude where the bear was located.  
+- `long`: Longitude where the bear was located.  
+- `urea_nitrogen`: Concentration of urea nitrogen.  
+- `creatinine`: Concentration of creatinine.  
+
+cused on the fasting behavior of polar bears in the Southern Beaufort (SB) and Chukchi seas (CS). 
+
+
 ##Computer Hygeine
 
 Sometimes I suppose it is good to keep my desktop, tabs, and physical laptop clean– 
@@ -36,6 +73,7 @@ library(leaflet) #for leaflet
 library("shiny") #shiny app
 library(shinydashboard)
 library(shinythemes)
+library(lubridate)
 
 
 #Stamen API key
@@ -745,8 +783,7 @@ life_history %>%
 
 #easiest way to do it lwk 
 life_history %>%
-  replace_with_na_all(condition = ~.x %in% c(common_na_numbers, common_na_strings)) %>%
-  mutate(newborn = na_if(newborn, "not measured")) #to na if "not measured"
+  replace_with_na_all(condition = ~.x %in% c(common_na_numbers, common_na_strings))
 ```
 
 ##Joining and formatting data in data frame
@@ -782,6 +819,9 @@ dmy(22092007)
 mdy_hms(month day year hour min sec)
 #basically changes it to r format 
 
+spider_date_cleaned <- spider %>% 
+    mutate(date = dmy(date))
+
 #saving final data to a '.csv'
 write.csv(spider_date_cleaned,"spiders_with_locs.csv", row.names=FALSE)
 ```
@@ -794,7 +834,7 @@ spiders %>%
   select(latitude,longitude) %>% 
   summary()
 #create bbox 
-lat <- c(34.67, 41.8)
+lat <- c(34.67, 41.8) #min, max
 long <- c(-124.1,-115.5)
 bbox <- make_bbox(long, lat, f=.03)
 #make map. 
