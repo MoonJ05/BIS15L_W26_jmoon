@@ -1,0 +1,72 @@
+---
+title: "Midterm 2 Corrections"
+author: "Jina Moon"
+date: "2026-03-05"
+output: html_document
+---
+
+## Load the libraries
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(janitor)
+library(naniar)
+library(ggmap)
+library(lubridate)
+library(shiny)
+``` 
+
+
+## Load the data
+Run the code chunk below to load the data, clean the names, and do some tidying.
+```{r message=FALSE, warning=FALSE}
+polar_bears <- 
+  read_csv("data/polarBear_serumUreaCreatinine_beaufortChukchi_rode.csv") %>% 
+  clean_names() %>% 
+  select(-den_method, -no_cubs, -cub_age) %>%
+  filter(age_class==c("A", "S")) %>% 
+  mutate(sex=toupper(sex), 
+         age_class=toupper(age_class))
+
+#replace unknown with NA (mating and denning)
+polar_bears_na <- polar_bears %>% 
+  replace_with_na(replace = list(mating = "unknown",
+                                 denning = "unknown"))
+```
+
+
+
+3. (6 points) Is sampling even for both sexes? Make a count the shows the number of males and females sampled by population and make a plot to visualize the counts.
+
+This is the answer I had before corrections. 
+
+```{r}
+#BEFORE CORRECTIONS
+polar_bears_na %>% 
+  group_by(popn) %>%  #by population 
+  count(sex) %>% 
+  ggplot(aes(x = sex, y = n, fill = popn)) + 
+  geom_col(position = "dodge") + 
+  labs(title = "Sampling of Sex by Population", fill = "Population", x = "Sex", y = "Count") +
+  theme(plot.title = element_text(size=rel(1.2), hjust = .5)) 
+```
+
+Looking back at the quesiton, I realized that it wants us to show the number of males and females by population, and not the sex which is how I ended up approaching the quesiton. 
+
+Fixing that I put the x = popn (instead of x = sex), and fill = sex (instead of fill = popn) and got... 
+```{r}
+#AFTER CORRECTIONS
+polar_bears_na %>% 
+  group_by(popn) %>%  #by population (you can apparently also do count(popn, sex)), but they do the same thing
+  count(sex) %>% 
+  ggplot(aes(x = popn, y = n, fill = sex)) + 
+  geom_col(position = "dodge") + 
+  labs(title = "Sampling of Sex by Population", fill = "Population", x = "Sex", y = "Count") +
+  theme(plot.title = element_text(size=rel(1.2), hjust = .5)) 
+```
+
+I can see how this shows the dicrepancies between sex by population more directly than the other way I did it, despite it having the same components. 
+
+Regardless, the written portion that I had would stay the same. 
+
+No, the sampling is not even for both population. The sampling between sex seems about even for the polar bears in Chukchi Seas (CS), but there seems to be more Female polar bear samples collected from the Southern Beaufort (SB) population than male polar bears. 
+

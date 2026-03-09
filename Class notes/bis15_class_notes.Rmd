@@ -5,43 +5,7 @@ date: "`r Sys.Date()`"
 output:
   html_document: 
     theme: spacelab
----
-
-6. (3 points) As explained above, the ratio of `urea_nitrogen` to `creatinine` is used as an index of fasting. To calculate the ratio, we need to multiply `urea_nitrogen` by 0.466, then divide by `creatinine`. Create a new variable called `un_creat_ratio` that contains this calculation.
-## MIDTERM 2 NOTES
-```{r}
-study = fasting beahvior of polar bears in SB and CS. 
-1983 to 2017
-BUN is blood urea nitrogen
-cretinine 
-... use to calculate ratio that indicates whether bear = fasting 
-#abstract.... 
-more than 7 days... 1448 samples from 1177 adults and subadult bears... should check result to paper later (highlighted) 
-
-popn --> population which ber belongs
-lat and long for ltitude and longitude
-
-#NA...
-bear id shouldn't have any 
-date is date
-
-
-```
-
-## The variables include:  
-- `bear_id`: A unique number given to each bear.    
-- `capture_date`: The data when the bear was tranquilized and assessed.  
-- `popn`: The population to which the bear belongs.  
-- `sex `: Sex of each bear.    
-- `age_class`: The age class of each bear (A=adult, S=subadult).   
-- `mating`: Whether or not the bear is pursuing a mate.  
-- `denning`: Whether or not the bear denned last year.  
-- `lat`: Latitude where the bear was located.  
-- `long`: Longitude where the bear was located.  
-- `urea_nitrogen`: Concentration of urea nitrogen.  
-- `creatinine`: Concentration of creatinine.  
-
-cused on the fasting behavior of polar bears in the Southern Beaufort (SB) and Chukchi seas (CS). 
+--- 
 
 
 ##Computer Hygeine
